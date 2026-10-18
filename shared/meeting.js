@@ -63,7 +63,6 @@ export function apply(state, action, caseCount) {
   switch (action.type) {
     case 'open':
       if (state.phase === PHASE.voting) return state
-      if (!CHOICES.includes(state.advice)) return state
       return touch({
         ...state,
         phase: PHASE.voting,

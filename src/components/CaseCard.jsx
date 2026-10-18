@@ -1,10 +1,12 @@
 import { CHOICE_STYLE, LEVEL_STYLE } from '../config'
+import RoleMark from './RoleMark'
 
-export default function CaseCard({ item, mode = 'full', myVote = null, votingOpen = false, onVote = null, advice = null, canAdvise = false, onAdvise = null }) {
+export default function CaseCard({ item, mode = 'full', myVote = null, votingOpen = false, onVote = null }) {
   const level = LEVEL_STYLE[item.level] || LEVEL_STYLE.cross
   const code = `NT-${String(item.id).padStart(2, '0')}`
   const showStory = mode !== 'choices'
   const showChoices = mode !== 'story'
+  const hostCase = item.addressedTo === 'host'
 
   return (
     <>
@@ -15,24 +17,23 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className={`chip ${level.chip}`}>{item.levelLabel}</span>
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
-          <h2>{item.title}</h2>
-          <p className="case-who">الأكثر معنياً بهالمشكلة هو {item.addressedLabel}</p>
-          <p className="case-label">المشكلة</p>
+          <div className="case-speak">
+            <RoleMark who={item.addressedTo} name={item.addressedLabel} host={hostCase} />
+            <div>
+              <h2>{item.title}</h2>
+              <p className="case-who">
+                {hostCase
+                  ? 'بتحكي رأيك بالقاعة، وبعدين بتفتحي التصويت وإحنا كلنا بنصوّت.'
+                  : 'بتحكي رأيها بالقاعة، وبعدين لما ينفتح التصويت بتصوّت معنا كلنا.'}
+              </p>
+            </div>
+          </div>
           {item.paragraphs.map((paragraph) => (
             <p key={paragraph} className="case-lead">
               {paragraph}
             </p>
           ))}
-          <div className="fact-row">
-            {item.facts.map((fact) => (
-              <div key={fact.label} className="fact-card">
-                <small>{fact.label}</small>
-                <b>{fact.value}</b>
-              </div>
-            ))}
-          </div>
           <p className="case-ask">{item.ask}</p>
-          <p className="case-label">السؤال</p>
           <p className="case-personal">{item.personalAsk}</p>
         </section>
       )}
@@ -43,26 +44,17 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             {item.options.map((option) => {
               const style = CHOICE_STYLE[option.key]
               const selected = myVote === option.key
-              const recommended = advice === option.key
-              const className = `choice-card ${selected ? style.ring : ''} ${recommended ? 'is-advice' : ''}`
+              const className = `choice-card ${selected ? style.ring : ''}`
               const body = (
                 <>
                   <span className={`text-sm font-black ${style.text}`}>
                     {option.key}
                     {selected ? ' · صوتك' : ''}
-                    {recommended ? ' · التوصية' : ''}
                   </span>
                   <strong>{option.title}</strong>
                   <p>{option.text}</p>
                 </>
               )
-              if (canAdvise && onAdvise) {
-                return (
-                  <button key={option.key} className={className} style={{ '--tone': style.bar }} onClick={() => onAdvise(option.key)}>
-                    {body}
-                  </button>
-                )
-              }
               if (!onVote) {
                 return (
                   <div key={option.key} className={className} style={{ '--tone': style.bar }}>

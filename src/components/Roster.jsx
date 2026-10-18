@@ -1,4 +1,4 @@
-export default function Roster({ roles, onlineIds, votes }) {
+export default function Roster({ roles, onlineIds, votes, spotlight = null }) {
   const online = new Set(onlineIds)
   return (
     <aside className="board-names">
@@ -7,8 +7,9 @@ export default function Roster({ roles, onlineIds, votes }) {
         {roles.map((role) => {
           const voted = Boolean(votes?.[String(role.id)])
           const connected = online.has(role.id)
+          const speaking = spotlight !== 'host' && Number(spotlight) === role.id
           return (
-            <li key={role.id} className={`lv-${role.level} ${connected ? 'is-on' : ''} ${voted ? 'is-voted' : ''}`}>
+            <li key={role.id} className={`lv-${role.level} ${connected ? 'is-on' : ''} ${voted ? 'is-voted' : ''} ${speaking ? 'is-speak' : ''}`}>
               <b>{role.id}</b>
               <span>{role.title}</span>
               <i />

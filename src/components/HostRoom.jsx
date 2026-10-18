@@ -87,31 +87,25 @@ export default function HostRoom({ identity, onLeave }) {
   return (
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={(state.caseIndex + 1) / cases.length}>
       <div className="board">
-        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} />}
+        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
         <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
           <CaseCard item={item} mode="story" />
           {state.phase === 'discuss' ? (
-            <CaseCard
-              item={item}
-              mode="choices"
-              advice={state.advice}
-              canAdvise={item.addressedTo === 'host'}
-              onAdvise={(choice) => send({ type: 'advise', choice })}
-            />
+            <CaseCard item={item} mode="choices" />
           ) : (
-            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} advice={state.advice} />
+            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
           )}
           <div className="board-dock">
             <button
               className="btn-gold"
-              disabled={state.phase === 'voting' || !state.advice}
+              disabled={state.phase === 'voting'}
               onClick={() => {
                 armVoteSound()
                 playVoteOpen()
                 send({ type: 'open' })
               }}
             >
-              {state.advice ? 'فتح التصويت · 12 ث' : 'بانتظار التوصية'}
+              فتح التصويت · 12 ث
             </button>
             <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
               إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
@@ -127,7 +121,6 @@ export default function HostRoom({ identity, onLeave }) {
             </button>
             <span className="me-auto text-xs font-bold text-mist">
               {String(item.id).padStart(2, '0')} / {cases.length} · {PHASE_LABEL[state.phase]}
-              {state.advice ? ` · التوصية ${state.advice}` : ''}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · {voteCount}/17
             </span>
             {!present && (

@@ -55,10 +55,6 @@ function assertMeetingFlow() {
   let state = createState()
   const blocked = apply(state, { type: 'vote', studentId: 4, choice: 'A' }, 30)
   if (blocked !== state) throw new Error('قُبل تصويت بينما الباب مغلق')
-  state = apply(state, { type: 'advise', choice: 'A' }, 30)
-  if (apply({ ...state, advice: null }, { type: 'open' }, 30).phase === PHASE.voting) {
-    throw new Error('انفتح التصويت قبل توصية صاحب الحالة')
-  }
   state = apply(state, { type: 'open' }, 30)
   if (state.phase !== PHASE.voting) throw new Error('لم يُفتح التصويت')
   if (!state.voteEndsAt || state.voteEndsAt - Date.now() < 11000) throw new Error('عدّ التصويت ليس 12 ثانية')

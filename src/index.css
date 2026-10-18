@@ -402,6 +402,14 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
   padding: 10px 8px 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 232, 0.95), rgba(255, 255, 255, 0.9) 28%, rgba(232, 248, 250, 0.92));
+}
+
+.case-story {
+  overflow: auto;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 232, 0.96), rgba(255, 255, 255, 0.94) 42%, rgba(232, 248, 250, 0.92));
 }
 
 .board-names h2 {
@@ -505,15 +513,20 @@ input:focus-visible {
   line-height: 1.25;
 }
 
-.case-lead {
-  display: -webkit-box;
+.case-label {
   margin: 0;
-  overflow: hidden;
-  color: #5c6778;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  color: #0e7c84;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.case-lead {
+  display: block;
+  margin: 0;
+  color: #1c2433;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.65;
 }
 
 .fact-row {
@@ -524,21 +537,25 @@ input:focus-visible {
 
 .fact-card {
   border-radius: 16px;
-  background: linear-gradient(180deg, #fff, #f7fbff);
   padding: 8px 12px;
-  border: 1px solid #e7eef6;
+  border: 1px solid transparent;
 }
+
+.fact-card:nth-child(1) { background: #fff4d6; border-color: #f0d98a; }
+.fact-card:nth-child(2) { background: #e5f7f8; border-color: #b7e4e7; }
+.fact-card:nth-child(3) { background: #ffefec; border-color: #f6c7c0; }
 
 .fact-card small {
   display: block;
-  color: #8b95a5;
+  color: #5c6778;
   font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .fact-card b {
   display: block;
   margin-top: 2px;
-  color: #0e7c84;
+  color: #1c2433;
   font-size: 1.25rem;
   line-height: 1.2;
 }
@@ -574,7 +591,7 @@ input:focus-visible {
   border: 1px solid color-mix(in srgb, var(--tone, #c9a227) 35%, #e4ebf3);
   border-radius: 18px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--tone, #c9a227) 14%, #fff), #fff 46%);
+    linear-gradient(180deg, color-mix(in srgb, var(--tone, #c9a227) 28%, #fff), #fff 55%);
   padding: 12px 14px;
   text-align: right;
   transition: transform 0.2s ease, box-shadow 0.2s ease;

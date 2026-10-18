@@ -16,6 +16,7 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
           <h2>{item.title}</h2>
+          <p className="case-label">وصف الحالة</p>
           {item.paragraphs.map((paragraph) => (
             <p key={paragraph} className="case-lead">
               {paragraph}

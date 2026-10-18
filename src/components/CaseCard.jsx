@@ -16,9 +16,8 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
           <h2>{item.title}</h2>
-          <p className="case-who">السؤال أولاً لـ {item.addressedLabel}</p>
-          <p className="case-personal">{item.personalAsk}</p>
-          <p className="case-label">وصف الحالة</p>
+          <p className="case-who">الأكثر معنياً بهالمشكلة هو {item.addressedLabel}</p>
+          <p className="case-label">المشكلة</p>
           {item.paragraphs.map((paragraph) => (
             <p key={paragraph} className="case-lead">
               {paragraph}
@@ -33,6 +32,8 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             ))}
           </div>
           <p className="case-ask">{item.ask}</p>
+          <p className="case-label">السؤال</p>
+          <p className="case-personal">{item.personalAsk}</p>
         </section>
       )}
       {showChoices && (

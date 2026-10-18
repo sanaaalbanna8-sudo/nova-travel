@@ -522,8 +522,11 @@ input:focus-visible {
 
 .case-personal {
   margin: 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: #fff8ea;
   color: #1c2433;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 800;
   line-height: 1.6;
 }

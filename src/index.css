@@ -649,11 +649,12 @@ button.choice-card:hover {
   display: -webkit-box;
   margin: 4px 0 0;
   overflow: hidden;
-  color: #5c6778;
-  font-size: 0.75rem;
-  line-height: 1.45;
+  color: #3d4654;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.5;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
 }
 
 .board-dock {

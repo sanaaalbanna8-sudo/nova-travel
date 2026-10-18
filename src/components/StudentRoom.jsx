@@ -62,7 +62,10 @@ export default function StudentRoom({ identity, onLeave }) {
               item={item}
               mode="choices"
               myVote={myVote}
+              advice={state.advice}
               votingOpen={votingOpen}
+              canAdvise={state.phase === 'discuss' && Number(item.addressedTo) === role.id}
+              onAdvise={(choice) => send({ type: 'advise', choice })}
               onVote={votingOpen ? (choice) => send({ type: 'vote', choice }) : null}
             />
           )}
@@ -71,7 +74,13 @@ export default function StudentRoom({ identity, onLeave }) {
             <strong className="text-sm text-ink">{role.title}</strong>
             <span className="text-xs font-bold text-faint">الرقم {role.id}</span>
             <span className="me-auto text-xs font-bold text-mist">
-              {PHASE_LABEL[state.phase]}
+              {state.phase === 'discuss' && !state.advice
+                ? Number(item.addressedTo) === role.id
+                  ? 'اختاري توصيتك أولاً'
+                  : `بانتظار توصية ${item.addressedLabel}`
+                : state.advice
+                  ? `التوصية ${state.advice}`
+                  : PHASE_LABEL[state.phase]}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''}
             </span>
             {secondsLeft !== null && (

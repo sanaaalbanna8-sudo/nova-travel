@@ -13,6 +13,7 @@ export function createState() {
     caseIndex: 0,
     phase: PHASE.discuss,
     votes: {},
+    advice: null,
     timerEndsAt: null,
     voteEndsAt: null,
     history: {},
@@ -33,6 +34,7 @@ function snapshot(state) {
   return {
     phase: state.phase,
     votes: { ...state.votes },
+    advice: state.advice || null,
     voteEndsAt: state.voteEndsAt || null,
   }
 }
@@ -51,6 +53,7 @@ function moveTo(state, index, caseCount) {
     caseIndex: index,
     phase: saved?.phase || PHASE.discuss,
     votes: saved?.votes ? { ...saved.votes } : {},
+    advice: saved?.advice || null,
     timerEndsAt: null,
     voteEndsAt: saved?.voteEndsAt || null,
   })
@@ -60,6 +63,7 @@ export function apply(state, action, caseCount) {
   switch (action.type) {
     case 'open':
       if (state.phase === PHASE.voting) return state
+      if (!CHOICES.includes(state.advice)) return state
       return touch({
         ...state,
         phase: PHASE.voting,
@@ -75,6 +79,12 @@ export function apply(state, action, caseCount) {
       return moveTo(state, state.caseIndex + 1, caseCount)
     case 'prev':
       return moveTo(state, state.caseIndex - 1, caseCount)
+    case 'advise': {
+      if (state.phase !== PHASE.discuss) return state
+      if (!CHOICES.includes(action.choice)) return state
+      if (state.advice === action.choice) return state
+      return touch({ ...state, advice: action.choice })
+    }
     case 'vote': {
       if (state.phase !== PHASE.voting) return state
       if (!studentIdOk(action.studentId)) return state
@@ -90,10 +100,11 @@ export function apply(state, action, caseCount) {
       return touch({
         ...state,
         votes: {},
+        advice: null,
         phase: PHASE.discuss,
         history: {
           ...state.history,
-          [state.caseIndex]: { phase: PHASE.discuss, votes: {}, voteEndsAt: null },
+          [state.caseIndex]: { phase: PHASE.discuss, votes: {}, advice: null, voteEndsAt: null },
         },
         voteEndsAt: null,
       })

@@ -1,6 +1,6 @@
 import { CHOICE_STYLE, LEVEL_STYLE } from '../config'
 
-export default function CaseCard({ item, mode = 'full', myVote = null, votingOpen = false, onVote = null }) {
+export default function CaseCard({ item, mode = 'full', myVote = null, votingOpen = false, onVote = null, advice = null, canAdvise = false, onAdvise = null }) {
   const level = LEVEL_STYLE[item.level] || LEVEL_STYLE.cross
   const code = `NT-${String(item.id).padStart(2, '0')}`
   const showStory = mode !== 'choices'
@@ -16,6 +16,8 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
           <h2>{item.title}</h2>
+          <p className="case-who">السؤال أولاً لـ {item.addressedLabel}</p>
+          <p className="case-personal">{item.personalAsk}</p>
           <p className="case-label">وصف الحالة</p>
           {item.paragraphs.map((paragraph) => (
             <p key={paragraph} className="case-lead">
@@ -40,17 +42,26 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             {item.options.map((option) => {
               const style = CHOICE_STYLE[option.key]
               const selected = myVote === option.key
-              const className = `choice-card ${selected ? style.ring : ''}`
+              const recommended = advice === option.key
+              const className = `choice-card ${selected ? style.ring : ''} ${recommended ? 'is-advice' : ''}`
               const body = (
                 <>
                   <span className={`text-sm font-black ${style.text}`}>
                     {option.key}
                     {selected ? ' · صوتك' : ''}
+                    {recommended ? ' · التوصية' : ''}
                   </span>
                   <strong>{option.title}</strong>
                   <p>{option.text}</p>
                 </>
               )
+              if (canAdvise && onAdvise) {
+                return (
+                  <button key={option.key} className={className} style={{ '--tone': style.bar }} onClick={() => onAdvise(option.key)}>
+                    {body}
+                  </button>
+                )
+              }
               if (!onVote) {
                 return (
                   <div key={option.key} className={className} style={{ '--tone': style.bar }}>

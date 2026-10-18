@@ -91,21 +91,27 @@ export default function HostRoom({ identity, onLeave }) {
         <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
           <CaseCard item={item} mode="story" />
           {state.phase === 'discuss' ? (
-            <CaseCard item={item} mode="choices" />
+            <CaseCard
+              item={item}
+              mode="choices"
+              advice={state.advice}
+              canAdvise={item.addressedTo === 'host'}
+              onAdvise={(choice) => send({ type: 'advise', choice })}
+            />
           ) : (
-            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} advice={state.advice} />
           )}
           <div className="board-dock">
             <button
               className="btn-gold"
-              disabled={state.phase === 'voting'}
+              disabled={state.phase === 'voting' || !state.advice}
               onClick={() => {
                 armVoteSound()
                 playVoteOpen()
                 send({ type: 'open' })
               }}
             >
-              فتح التصويت · 12 ث
+              {state.advice ? 'فتح التصويت · 12 ث' : 'بانتظار التوصية'}
             </button>
             <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
               إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
@@ -121,6 +127,7 @@ export default function HostRoom({ identity, onLeave }) {
             </button>
             <span className="me-auto text-xs font-bold text-mist">
               {String(item.id).padStart(2, '0')} / {cases.length} · {PHASE_LABEL[state.phase]}
+              {state.advice ? ` · التوصية ${state.advice}` : ''}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · {voteCount}/17
             </span>
             {!present && (

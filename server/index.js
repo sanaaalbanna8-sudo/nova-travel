@@ -42,6 +42,7 @@ function normalize(raw) {
   }
   if (![PHASE.discuss, PHASE.voting, PHASE.results].includes(next.phase)) next.phase = PHASE.discuss
   if (!next.votes || typeof next.votes !== 'object') next.votes = {}
+  if (!['A', 'B', 'C'].includes(next.advice)) next.advice = null
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
   return next
@@ -77,6 +78,7 @@ function viewFor(client) {
     phase: meeting.phase,
     timerEndsAt: meeting.timerEndsAt,
     voteEndsAt: meeting.voteEndsAt,
+    advice: meeting.advice,
     updatedAt: meeting.updatedAt,
   }
   if (client.isHost) {
@@ -191,8 +193,20 @@ wss.on('connection', (ws) => {
     if (!ws.joined) return
 
     if (message.type === 'host' && ws.isHost) {
-      const action = { type: message.action, caseIndex: Number(message.caseIndex), minutes: Number(message.minutes) }
+      const action = {
+        type: message.action,
+        caseIndex: Number(message.caseIndex),
+        minutes: Number(message.minutes),
+        choice: message.choice,
+      }
+      if (action.type === 'advise' && cases[meeting.caseIndex]?.addressedTo !== 'host') return
       commit(apply(meeting, action, cases.length))
+    }
+
+    if (message.type === 'advise' && ws.studentId) {
+      const item = cases[meeting.caseIndex]
+      if (String(item?.addressedTo) !== String(ws.studentId)) return
+      commit(apply(meeting, { type: 'advise', choice: message.choice }, cases.length))
     }
 
     if (message.type === 'vote' && ws.studentId) {

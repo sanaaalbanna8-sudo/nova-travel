@@ -43,7 +43,7 @@ export function useVoteSeconds(endsAt, active) {
   return Math.max(0, Math.ceil((endsAt - now) / 1000))
 }
 
-export default function VoteStage({ item, phase, endsAt, votes }) {
+export default function VoteStage({ item, phase, endsAt, votes, advice = null }) {
   const live = phase === 'voting'
   const reveal = phase === 'results'
   const now = useNow(live)
@@ -106,6 +106,7 @@ export default function VoteStage({ item, phase, endsAt, votes }) {
         <p className="text-xs tracking-[0.18em] text-gold2">{reveal ? 'النتائج' : 'باب التصويت'}</p>
         <h2 className="mt-1 font-display text-2xl text-ink">{item.question}</h2>
         <p className="mt-2 text-sm text-mist">{reveal ? 'أُغلق العدّ. هذا توزيع القاعة.' : 'اثنتا عشرة ثانية. الصوت يظهر لحظة وصوله.'}</p>
+        {advice && <p className="vote-advice">توصية {item.addressedLabel}: {advice}</p>}
       </div>
       <div className="vote-ring-wrap">
         <svg viewBox="0 0 220 220" className="vote-ring" aria-hidden="true">

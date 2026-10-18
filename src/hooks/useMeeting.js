@@ -140,6 +140,8 @@ export function useMeeting(identity) {
     if (modeRef.current === 'live' && wsRef.current?.readyState === WebSocket.OPEN) {
       if (action.type === 'vote') {
         wsRef.current.send(JSON.stringify({ type: 'vote', choice: action.choice }))
+      } else if (action.type === 'advise' && identityRef.current.role === 'student') {
+        wsRef.current.send(JSON.stringify({ type: 'advise', choice: action.choice }))
       } else {
         wsRef.current.send(
           JSON.stringify({
@@ -147,6 +149,7 @@ export function useMeeting(identity) {
             action: action.type,
             caseIndex: action.caseIndex,
             minutes: action.minutes,
+            choice: action.choice,
           }),
         )
       }

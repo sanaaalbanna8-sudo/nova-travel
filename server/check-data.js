@@ -30,6 +30,10 @@ export function validateData(cases, roles) {
     const label = `الحالة ${index + 1}`
     if (item.id !== index + 1) errors.push(`${label}: المعرف لا يطابق الترتيب`)
     if (!item.title || !item.question || !item.ask) errors.push(`${label}: العنوان أو السؤال ناقص`)
+    if (!item.personalAsk || !item.addressedLabel) errors.push(`${label}: سؤال صاحب المقعد ناقص`)
+    if (item.addressedTo !== 'host' && !(Number.isInteger(item.addressedTo) && item.addressedTo >= 1 && item.addressedTo <= 17)) {
+      errors.push(`${label}: المقعد الموجّه غير معروف`)
+    }
     if (!Array.isArray(item.paragraphs) || item.paragraphs.length < 2) errors.push(`${label}: السيناريو ناقص`)
     if (!Array.isArray(item.facts) || item.facts.length < 3) errors.push(`${label}: بطاقة البيانات ناقصة`)
     if (!Array.isArray(item.topics) || !item.topics.length) errors.push(`${label}: المواضيع ناقصة`)
@@ -40,6 +44,10 @@ export function validateData(cases, roles) {
       if (!option.title || !option.text) errors.push(`${label}: نص الخيار ${option.key} ناقص`)
     })
   })
+  const hostCases = cases.filter((item) => item.addressedTo === 'host')
+  const seats = cases.map((item) => item.addressedTo).filter((id) => id !== 'host')
+  if (hostCases.length !== 3) errors.push(`يُتوقع 3 حالات للمدير العام، الموجود: ${hostCases.length}`)
+  if (new Set(seats).size !== 17 || seats.length !== 17) errors.push('كل مقعد من 1 إلى 17 يحتاج حالة واحدة')
   return errors
 }
 
@@ -47,6 +55,10 @@ function assertMeetingFlow() {
   let state = createState()
   const blocked = apply(state, { type: 'vote', studentId: 4, choice: 'A' }, 30)
   if (blocked !== state) throw new Error('قُبل تصويت بينما الباب مغلق')
+  state = apply(state, { type: 'advise', choice: 'A' }, 30)
+  if (apply({ ...state, advice: null }, { type: 'open' }, 30).phase === PHASE.voting) {
+    throw new Error('انفتح التصويت قبل توصية صاحب الحالة')
+  }
   state = apply(state, { type: 'open' }, 30)
   if (state.phase !== PHASE.voting) throw new Error('لم يُفتح التصويت')
   if (!state.voteEndsAt || state.voteEndsAt - Date.now() < 11000) throw new Error('عدّ التصويت ليس 12 ثانية')

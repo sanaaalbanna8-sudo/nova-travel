@@ -16,6 +16,7 @@ export default function HostRoom({ identity, onLeave }) {
   const { state, status, send, onlineIds } = meeting
   const [present, setPresent] = useState(false)
   const [showNotes, setShowNotes] = useState(false)
+  const [tools, setTools] = useState(false)
   const [modal, setModal] = useState(null)
   const [topic, setTopic] = useState('الكل')
   const [pending, setPending] = useState(null)
@@ -84,61 +85,19 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة">
-      {status === 'local' && (
-        <p className="mb-4 rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm leading-7 text-gold2">
-          الخادم غير متصل. التصويت يتزامن بين تبويبات هذا الجهاز فقط. للحصّة على أجهزة الطلاب شغّلي التطبيق ثم حدّثي الصفحة.
-        </p>
-      )}
-
-      <section className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm text-gold">المضيفة: {HOST_NAME}</p>
-          <h1 className="font-display text-4xl text-white">لوحة الرئاسة</h1>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <span className="chip border-line bg-ink text-white">
-            الحالة {String(item.id).padStart(2, '0')} / {cases.length}
-          </span>
-          <span className="chip border-gold/40 bg-gold/10 text-gold2">{PHASE_LABEL[state.phase]}</span>
-          {clock && (
-            <span className={`chip ${clock.done ? 'border-coral/40 text-coral' : 'border-sea/40 text-sea'}`}>
-              {clock.done ? 'انتهى وقت النقاش' : `المؤقت ${clock.label}`}
-            </span>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={(state.caseIndex + 1) / cases.length}>
+      <div className="board">
+        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} />}
+        <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
+          <CaseCard item={item} mode="story" />
+          {state.phase === 'discuss' ? (
+            <CaseCard item={item} mode="choices" />
+          ) : (
+            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
           )}
-        </div>
-      </section>
-
-      {(state.phase === 'voting' || state.phase === 'results') && (
-        <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
-      )}
-
-      <div className={`grid items-start gap-5 ${state.phase === 'discuss' || !present ? 'lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.8fr)]' : 'lg:justify-items-end'}`}>
-        {(state.phase === 'discuss' || !present) && (
-        <div className="space-y-5">
-          {state.phase === 'discuss' && <CaseCard item={item} />}
-          {!present && (
-            <section className="host-private panel p-5">
-              <button className="flex w-full items-center justify-between text-lg font-semibold text-gold2" onClick={() => setShowNotes((value) => !value)}>
-                ملاحظة المضيف
-                <span className="text-sm text-faint">{showNotes ? 'إخفاء' : 'إظهار'}</span>
-              </button>
-              {showNotes && (
-                <div className="mt-3 space-y-3 text-sm leading-8 text-mist">
-                  {item.hostNotes.map((note) => (
-                    <p key={note}>{note}</p>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-        </div>
-        )}
-
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <section className="panel space-y-3 p-4">
+          <div className="board-dock">
             <button
-              className="btn-gold w-full text-base"
+              className="btn-gold"
               disabled={state.phase === 'voting'}
               onClick={() => {
                 armVoteSound()
@@ -146,78 +105,90 @@ export default function HostRoom({ identity, onLeave }) {
                 send({ type: 'open' })
               }}
             >
-              فتح باب التصويت · 12 ثانية
+              فتح التصويت · 12 ث
             </button>
-            <button className="btn-sea w-full text-base" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
-              إغلاق التصويت وعرض النتائج
-              {state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
+            <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
+              إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
             </button>
-            <div className="grid grid-cols-2 gap-2">
-              <button className="btn-ghost" disabled={state.caseIndex === 0} onClick={() => askMove({ type: 'prev' })}>
-                الحالة السابقة
+            <button className="btn-ghost" disabled={state.caseIndex === 0} onClick={() => askMove({ type: 'prev' })}>
+              السابقة
+            </button>
+            <button className="btn-ghost" disabled={state.caseIndex === cases.length - 1} onClick={() => askMove({ type: 'next' })}>
+              التالية
+            </button>
+            <button className="btn-ghost" onClick={() => setModal('cases')}>
+              الحالات
+            </button>
+            <span className="me-auto text-xs font-bold text-mist">
+              {String(item.id).padStart(2, '0')} / {cases.length} · {PHASE_LABEL[state.phase]}
+              {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · {voteCount}/17
+            </span>
+            {!present && (
+              <button className="btn-ghost" onClick={() => setTools((value) => !value)}>
+                أدوات الحصة
               </button>
-              <button
-                className="btn-ghost"
-                disabled={state.caseIndex === cases.length - 1}
-                onClick={() => askMove({ type: 'next' })}
-              >
-                الحالة التالية
-              </button>
-            </div>
-            <button className="btn-ghost w-full" onClick={() => setModal('cases')}>
-              كل الحالات
+            )}
+            <button className="btn-ghost" onClick={() => setPresent((value) => !value)}>
+              {present ? 'إظهار الأسماء' : 'وضع العرض'}
             </button>
-            <p className="text-center text-xs leading-6 text-faint">صوّت {voteCount} من 17 · المتصلون {onlineIds.length}</p>
-          </section>
+          </div>
+        </div>
+      </div>
 
-          {!present && (
-            <section className="host-private panel space-y-3 p-4">
-              <p className="text-sm font-semibold text-white">أدوات الحصة</p>
-              <div className="grid grid-cols-3 gap-2">
-                {[5, item.minutes, 10].map((minutes) => (
-                  <button key={minutes} className="btn-ghost px-2" onClick={() => send({ type: 'timer', minutes })}>
-                    {minutes} د
-                  </button>
+      {tools && !present && (
+        <aside className="tools-drawer">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-extrabold text-ink">أدوات الحصة</h2>
+            <button className="btn-ghost min-h-10 px-3" onClick={() => setTools(false)}>
+              إغلاق
+            </button>
+          </div>
+          <div className="space-y-3">
+            <button className="flex w-full items-center justify-between text-sm font-extrabold text-gold2" onClick={() => setShowNotes((value) => !value)}>
+              ملاحظة المضيف
+              <span className="text-xs text-faint">{showNotes ? 'إخفاء' : 'إظهار'}</span>
+            </button>
+            {showNotes && (
+              <div className="space-y-2 text-sm leading-7 text-mist">
+                {item.hostNotes.map((note) => (
+                  <p key={note}>{note}</p>
                 ))}
               </div>
-              <button className="btn-ghost w-full" onClick={() => send({ type: 'timer', minutes: 0 })}>
-                إيقاف المؤقت
-              </button>
-              <button className="btn-ghost w-full" onClick={() => setModal('roles')}>
-                دليل الأدوار
-              </button>
-              <button className="btn-ghost w-full" onClick={() => setModal('glossary')}>
-                ورقة المفاهيم
-              </button>
-              <button className="btn-ghost w-full" onClick={() => setModal('links')}>
-                رابطا الدخول
-              </button>
-              {state.phase === 'results' && (
-                <button className="btn-ghost w-full" onClick={() => setModal('names')}>
-                  كشف أصوات الأدوار
+            )}
+            <div className="grid grid-cols-3 gap-2">
+              {[5, item.minutes, 10].map((minutes) => (
+                <button key={minutes} className="btn-ghost px-2" onClick={() => send({ type: 'timer', minutes })}>
+                  {minutes} د
                 </button>
-              )}
-              <button className="btn-danger w-full" onClick={() => setPending({ type: 'clear-votes' })}>
-                مسح أصوات هذه الحالة
+              ))}
+            </div>
+            <button className="btn-ghost w-full" onClick={() => send({ type: 'timer', minutes: 0 })}>
+              إيقاف المؤقت
+            </button>
+            <button className="btn-ghost w-full" onClick={() => setModal('roles')}>
+              دليل الأدوار
+            </button>
+            <button className="btn-ghost w-full" onClick={() => setModal('glossary')}>
+              ورقة المفاهيم
+            </button>
+            <button className="btn-ghost w-full" onClick={() => setModal('links')}>
+              رابطا الدخول
+            </button>
+            {state.phase === 'results' && (
+              <button className="btn-ghost w-full" onClick={() => setModal('names')}>
+                كشف أصوات الأدوار
               </button>
-              <button className="btn-danger w-full" onClick={() => setPending({ type: 'reset' })}>
-                إعادة ضبط الاجتماع
-              </button>
-            </section>
-          )}
-
-          <button className="btn-ghost w-full" onClick={() => setPresent((value) => !value)}>
-            {present ? 'إظهار أدوات المعلمة' : 'وضع العرض'}
-          </button>
-
-          {!present && (
-            <section className="host-private panel p-4">
-              <h2 className="mb-3 text-sm font-semibold text-white">حضور الأقسام</h2>
-              <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} />
-            </section>
-          )}
+            )}
+            <button className="btn-danger w-full" onClick={() => setPending({ type: 'clear-votes' })}>
+              مسح أصوات هذه الحالة
+            </button>
+            <button className="btn-danger w-full" onClick={() => setPending({ type: 'reset' })}>
+              إعادة ضبط الاجتماع
+            </button>
+            <p className="text-xs leading-6 text-faint">المتصلون {onlineIds.length} · المضيفة {HOST_NAME}</p>
+          </div>
         </aside>
-      </div>
+      )}
 
       {modal === 'cases' && (
         <Modal title="حالات الاجتماع" wide onClose={() => setModal(null)}>
@@ -241,11 +212,11 @@ export default function HostRoom({ identity, onLeave }) {
                 return (
                   <button
                     key={entry.id}
-                    className={`rounded-2xl border px-4 py-3 text-right ${current ? 'border-gold bg-gold/10' : 'border-line bg-ink'}`}
+                    className={`rounded-2xl border px-4 py-3 text-right ${current ? 'border-gold bg-gold/10' : 'border-line bg-paper'}`}
                     onClick={() => askMove({ type: 'goto', caseIndex: entry.id - 1 })}
                   >
                     <span className="text-xs text-gold">NT-{String(entry.id).padStart(2, '0')}</span>
-                    <span className="mt-1 block font-semibold text-white">{entry.title}</span>
+                    <span className="mt-1 block font-semibold text-ink">{entry.title}</span>
                     <span className="mt-1 block text-xs text-faint">
                       {entry.levelLabel}
                       {done ? ' · تم التصويت' : ''}
@@ -261,11 +232,11 @@ export default function HostRoom({ identity, onLeave }) {
         <Modal title="دليل الأدوار" wide onClose={() => setModal(null)}>
           <div className="grid gap-3 md:grid-cols-2">
             {roles.map((role) => (
-              <div key={role.id} className="rounded-2xl border border-line bg-ink p-4">
+              <div key={role.id} className="rounded-2xl border border-line bg-paper p-4">
                 <p className="text-xs text-gold">
                   {role.id} · {role.levelLabel}
                 </p>
-                <p className="mt-1 font-semibold text-white">{role.title}</p>
+                <p className="mt-1 font-semibold text-ink">{role.title}</p>
                 <p className="mt-2 text-sm leading-7 text-mist">{role.mandate}</p>
               </div>
             ))}
@@ -277,7 +248,7 @@ export default function HostRoom({ identity, onLeave }) {
         <Modal title="ورقة المفاهيم" onClose={() => setModal(null)}>
           <div className="space-y-3">
             {GLOSSARY.map((entry) => (
-              <div key={entry.term} className="rounded-2xl border border-line bg-ink p-4">
+              <div key={entry.term} className="rounded-2xl border border-line bg-paper p-4">
                 <p className="font-semibold text-gold2">{entry.term}</p>
                 <p className="mt-1 text-sm leading-7 text-mist">{entry.text}</p>
               </div>
@@ -315,8 +286,8 @@ export default function HostRoom({ identity, onLeave }) {
           <p className="mb-4 text-sm leading-7 text-coral">هذه القائمة للمضيفة. لا تُعرض على شاشة الطلاب.</p>
           <div className="space-y-2">
             {roles.map((role) => (
-              <div key={role.id} className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-ink px-4 py-2 text-sm">
-                <span className="text-white">
+              <div key={role.id} className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-paper px-4 py-2 text-sm">
+                <span className="text-ink">
                   {role.id}. {role.title}
                 </span>
                 <span className="font-semibold text-gold2">{state.votes[String(role.id)] || '—'}</span>
@@ -325,7 +296,7 @@ export default function HostRoom({ identity, onLeave }) {
           </div>
           <textarea
             readOnly
-            className="mt-4 h-28 w-full rounded-2xl border border-line bg-ink p-3 text-sm text-mist"
+            className="mt-4 h-28 w-full rounded-2xl border border-line bg-paper p-3 text-sm text-mist"
             value={roles
               .map((role) => `${role.id}. ${role.title}: ${state.votes[String(role.id)] || 'بدون صوت'}`)
               .join('\n')}

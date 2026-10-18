@@ -10,31 +10,31 @@ export const MEETING_EN = 'The Emergency Meeting'
 
 export const LEVEL_STYLE = {
   strategic: {
-    chip: 'border-gold/40 bg-gold/10 text-gold2',
+    chip: 'border-gold/40 bg-gold/15 text-gold2',
     dot: 'bg-gold',
-    bar: '#b59a6a',
+    bar: '#c9a227',
   },
   management: {
-    chip: 'border-sea/40 bg-sea/10 text-sea',
+    chip: 'border-sea/30 bg-sea/10 text-sea',
     dot: 'bg-sea',
-    bar: '#a8b4c4',
+    bar: '#0e7c84',
   },
   operational: {
-    chip: 'border-line bg-panel2 text-mist',
-    dot: 'bg-mist',
-    bar: '#8e9aab',
+    chip: 'border-coral/30 bg-coral/10 text-coral',
+    dot: 'bg-coral',
+    bar: '#e15a4a',
   },
   cross: {
-    chip: 'border-coral/40 bg-coral/10 text-coral',
-    dot: 'bg-coral',
-    bar: '#a6847c',
+    chip: 'border-line bg-panel2 text-mist',
+    dot: 'bg-mist',
+    bar: '#8b95a5',
   },
 }
 
 export const CHOICE_STYLE = {
-  A: { bar: '#b59a6a', text: 'text-gold2', ring: 'border-gold bg-gold/10' },
-  B: { bar: '#a8b4c4', text: 'text-sea', ring: 'border-sea bg-sea/10' },
-  C: { bar: '#a6847c', text: 'text-coral', ring: 'border-coral bg-coral/10' },
+  A: { bar: '#c9a227', text: 'text-gold2', ring: 'border-gold bg-[#fff8ea]' },
+  B: { bar: '#0e7c84', text: 'text-sea', ring: 'border-sea bg-[#eefafa]' },
+  C: { bar: '#e15a4a', text: 'text-coral', ring: 'border-coral bg-[#fff1ee]' },
 }
 
 export const PHASE_LABEL = {

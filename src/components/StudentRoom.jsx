@@ -27,7 +27,7 @@ export default function StudentRoom({ identity, onLeave }) {
     return (
       <Shell status="connecting" onLeave={() => onLeave('')}>
         <div className="panel mx-auto max-w-xl p-8 text-center">
-          <h1 className="font-display text-4xl text-white">هذا الرقم مفتوح على جهاز آخر</h1>
+          <h1 className="font-display text-4xl text-ink">هذا الرقم مفتوح على جهاز آخر</h1>
           <p className="mt-4 leading-8 text-mist">إذا كان الجهاز الحالي هو المقصود، يُعاد اختيار الرقم بعد إغلاق الصفحة الأخرى.</p>
           <button className="btn-gold mt-6" onClick={() => onLeave('')}>
             العودة لاختيار الرقم
@@ -51,59 +51,37 @@ export default function StudentRoom({ identity, onLeave }) {
   const votingOpen = state.phase === 'voting'
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم">
-      {status === 'local' && (
-        <p className="mb-4 rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm leading-7 text-gold2">
-          هذه تجربة على الجهاز نفسه. أجهزة الطلاب تتصل حين يعمل خادم الاجتماع.
-        </p>
-      )}
-
-      <section className="panel mb-5 p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage progress={(state.caseIndex + 1) / cases.length}>
+      <div className="board board-student">
+        <div className="board-main">
+          <CaseCard item={item} mode="story" />
+          {summary ? (
+            <ResultsBoard item={item} summary={summary} myVote={myVote} compact />
+          ) : (
+            <CaseCard
+              item={item}
+              mode="choices"
+              myVote={myVote}
+              votingOpen={votingOpen}
+              onVote={votingOpen ? (choice) => send({ type: 'vote', choice }) : null}
+            />
+          )}
+          <div className="board-dock">
             <span className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</span>
-            <h1 className="mt-3 font-display text-3xl text-white sm:text-4xl">{role.title}</h1>
-            <p className="mt-2 text-sm text-faint">الرقم الوظيفي {role.id}</p>
-          </div>
-          <div className="text-start">
-            <p className="text-xs text-faint">الحالة {String(item.id).padStart(2, '0')} / {cases.length}</p>
-            {clock && (
-              <p className={`mt-2 text-sm ${clock.done ? 'text-coral' : 'text-sea'}`}>
-                {clock.done ? 'انتهى وقت النقاش' : `وقت النقاش ${clock.label}`}
-              </p>
+            <strong className="text-sm text-ink">{role.title}</strong>
+            <span className="text-xs font-bold text-faint">الرقم {role.id}</span>
+            <span className="me-auto text-xs font-bold text-mist">
+              {PHASE_LABEL[state.phase]}
+              {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''}
+            </span>
+            {secondsLeft !== null && (
+              <div className={`vote-student-clock ${secondsLeft <= 3 ? 'is-urgent' : ''}`}>
+                <strong key={secondsLeft}>{secondsLeft}</strong>
+                <span>ثانية</span>
+              </div>
             )}
           </div>
         </div>
-        <p className="mt-4 leading-8 text-mist">{role.mandate}</p>
-      </section>
-
-      <div
-        className={`sticky top-[69px] z-20 mb-5 rounded-2xl border px-4 py-3 text-sm ${
-          votingOpen ? 'border-gold/40 bg-ink/95 text-gold2' : 'border-line bg-ink/95 text-mist'
-        }`}
-      >
-        <div className="flex items-center justify-between gap-4">
-          <p>
-            {PHASE_LABEL[state.phase]}
-            {votingOpen ? ' — يمكن تعديل الصوت قبل انتهاء الثواني.' : ' — الخيارات معروضة للنقاش، والأزرار تنتظر فتح الباب.'}
-          </p>
-          {secondsLeft !== null && (
-            <div className={`vote-student-clock ${secondsLeft <= 3 ? 'is-urgent' : ''}`}>
-              <strong key={secondsLeft}>{secondsLeft}</strong>
-              <span>ثانية</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-5">
-        <CaseCard
-          item={item}
-          myVote={myVote}
-          votingOpen={votingOpen}
-          onVote={votingOpen ? (choice) => send({ type: 'vote', choice }) : null}
-        />
-        {summary && <ResultsBoard item={item} summary={summary} myVote={myVote} />}
       </div>
     </Shell>
   )

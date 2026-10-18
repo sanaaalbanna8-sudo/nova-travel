@@ -21,7 +21,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
       <div className="mb-8 flex items-center gap-3 text-gold">
         <Mark className="h-12 w-12" />
         <div>
-          <p className="text-sm font-semibold text-white">
+          <p className="text-sm font-semibold text-ink">
             {BRAND_AR}
             <span className="mx-1.5 font-normal text-faint">·</span>
             <span className="tracking-wide text-gold2">{BRAND_EN}</span>
@@ -42,7 +42,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
             if (pin.trim()) onHost(pin.trim())
           }}
         >
-          <h2 className="font-display text-4xl text-white">مقعد الرئاسة</h2>
+          <h2 className="font-display text-4xl text-ink">مقعد الرئاسة</h2>
           <p className="mt-3 text-sm leading-7 text-mist">يُدخل المضيف رمز الجلسة للمتابعة إلى لوحة التحكم.</p>
           <label className="mt-6 block text-sm text-gold2" htmlFor="pin">
             رمز المضيف
@@ -53,7 +53,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
             value={pin}
             autoComplete="current-password"
             onChange={(event) => setPin(event.target.value)}
-            className="mt-2 w-full rounded-2xl border border-line bg-ink px-4 py-3 text-white"
+            className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-ink"
           />
           {error && <p className="mt-3 text-sm text-coral">{error}</p>}
           <button className="btn-gold mt-6 w-full" type="submit">
@@ -65,7 +65,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
       {step === 'student' && !role && (
         <div className="mt-6">
           <div className="mb-6">
-            <h2 className="font-display text-4xl text-white">الرقم الوظيفي</h2>
+            <h2 className="font-display text-4xl text-ink">الرقم الوظيفي</h2>
             <p className="mt-2 text-sm text-mist">يُختار الرقم الذي وُزّع في بداية الاجتماع.</p>
           </div>
           <div className="grid gap-5">
@@ -81,7 +81,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
                     .map((item) => (
                       <button
                         key={item.id}
-                        className="rounded-2xl border border-line bg-ink py-4 text-xl font-semibold text-white hover:border-gold/50"
+                        className="rounded-2xl border border-line bg-white py-4 text-xl font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-gold"
                         onClick={() => setPicked(item.id)}
                       >
                         {item.id}
@@ -98,11 +98,11 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
         <div className="panel mx-auto mt-8 max-w-2xl p-6 sm:p-8">
           <p className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</p>
           <p className="mt-4 text-sm text-faint">الرقم {role.id}</p>
-          <h2 className="mt-2 font-display text-4xl leading-snug text-white">{role.title}</h2>
+          <h2 className="mt-2 font-display text-4xl leading-snug text-ink">{role.title}</h2>
           <p className="mt-4 leading-8 text-mist">{role.mandate}</p>
           <ul className="mt-4 space-y-2 text-sm leading-7 text-mist">
             {role.duties.map((duty) => (
-              <li key={duty} className="rounded-2xl border border-line bg-ink/60 px-4 py-3">
+              <li key={duty} className="rounded-2xl border border-line bg-panel2 px-4 py-3">
                 {duty}
               </li>
             ))}

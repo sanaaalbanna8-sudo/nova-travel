@@ -4,8 +4,6 @@ import { tally, summarize } from '../../shared/meeting.js'
 import { playVoteLand, playVoteReveal, playVoteTick } from '../lib/voteSound'
 import roles from '../data/roles.json'
 
-const VOTE_MS = 12000
-
 function useNow(active) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
@@ -43,14 +41,14 @@ export function useVoteSeconds(endsAt, active) {
   return Math.max(0, Math.ceil((endsAt - now) / 1000))
 }
 
-export default function VoteStage({ item, phase, endsAt, votes }) {
+export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) {
   const live = phase === 'voting'
   const reveal = phase === 'results'
   const now = useNow(live)
   const leftMs = live && endsAt ? Math.max(0, endsAt - now) : 0
   const second = live ? Math.max(0, Math.ceil(leftMs / 1000)) : 0
   const urgent = live && second > 0 && second <= 3
-  const progress = live ? Math.min(1, leftMs / VOTE_MS) : reveal ? 1 : 0
+  const progress = live ? Math.min(1, leftMs / (seconds * 1000)) : reveal ? 1 : 0
   const counts = useMemo(() => tally(votes || {}), [votes])
   const levels = useMemo(() => summarize(votes || {}, roles).levels, [votes])
   const top = Math.max(counts.counts.A, counts.counts.B, counts.counts.C)
@@ -173,7 +171,7 @@ function Column({ option, count, percent, total, reveal, winner, delay }) {
         <i style={{ height: `${width}%` }} />
       </div>
         <p>{option.title}</p>
-        <small>{option.text}</small>
+        <small className={option.role ? 'is-role' : ''}>{option.role ? `${option.role}. ${option.text}` : option.text}</small>
     </article>
   )
 }

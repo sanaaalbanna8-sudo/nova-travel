@@ -32,6 +32,7 @@ export default function QuizCard({ item, total, mode = 'story', myVote = null, v
                 {selected ? ' · صوتك' : ''}
               </span>
               <strong>{option.title}</strong>
+              {option.role && <em>{option.role}</em>}
               <p>{option.text}</p>
             </>
           )

@@ -91,6 +91,8 @@ function assertMeetingFlow() {
   quiz = apply(quiz, { type: 'quiz-start' }, 20)
   if (quiz.briefing !== null || quiz.quizIndex !== 0) throw new Error('لم تبدأ الأسئلة السريعة')
   quiz = apply(quiz, { type: 'open' }, 20)
+  const quizLeft = quiz.voteEndsAt - Date.now()
+  if (quizLeft < 14000 || quizLeft > 16000) throw new Error('عدّ السؤال السريع ليس 15 ثانية')
   quiz = apply(quiz, { type: 'vote', studentId: 2, choice: 'C' }, 20)
   const saved = quiz.ledger.find((item) => item.kind === 'quiz' && item.quizId === 1)
   if (!saved || saved.choice !== 'C' || quiz.votes['2'] !== 'C') throw new Error('لم يُحفظ صوت السؤال السريع')

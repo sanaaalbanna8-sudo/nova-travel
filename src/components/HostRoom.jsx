@@ -110,7 +110,7 @@ export default function HostRoom({ identity, onLeave }) {
               {state.phase === 'discuss' ? (
                 <QuizCard item={quiz} total={QUIZZES.length} mode="choices" />
               ) : (
-                <VoteStage item={quiz} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+                <VoteStage item={quiz} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} seconds={15} />
               )}
             </>
           ) : (
@@ -168,7 +168,7 @@ export default function HostRoom({ identity, onLeave }) {
                     send({ type: 'open' })
                   }}
                 >
-                  فتح التصويت · 12 ث
+                  فتح التصويت · 15 ث
                 </button>
                 <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
                   إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}

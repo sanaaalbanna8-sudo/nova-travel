@@ -6,6 +6,7 @@ export const PHASE = {
 
 export const CHOICES = ['A', 'B', 'C']
 export const VOTE_SECONDS = 12
+export const QUIZ_VOTE_SECONDS = 15
 export const BRIEF_MAX = 6
 export const QUIZ_MAX = 9
 
@@ -48,6 +49,10 @@ function snapshot(state) {
 
 function inQuiz(state) {
   return Number.isInteger(state.quizIndex) && typeof state.briefing !== 'number'
+}
+
+function voteSeconds(state) {
+  return inQuiz(state) ? QUIZ_VOTE_SECONDS : VOTE_SECONDS
 }
 
 function rememberQuiz(state) {
@@ -105,7 +110,7 @@ export function apply(state, action, caseCount) {
         ...state,
         phase: PHASE.voting,
         timerEndsAt: null,
-        voteEndsAt: Date.now() + VOTE_SECONDS * 1000,
+        voteEndsAt: Date.now() + voteSeconds(state) * 1000,
       })
     case 'close':
       if (state.phase !== PHASE.voting) return state
@@ -150,7 +155,7 @@ export function apply(state, action, caseCount) {
       if (!CHOICES.includes(action.choice)) return state
       const key = String(Number(action.studentId))
       if (state.votes[key] === action.choice) return state
-      const opened = typeof state.voteEndsAt === 'number' ? state.voteEndsAt - VOTE_SECONDS * 1000 : Date.now()
+      const opened = typeof state.voteEndsAt === 'number' ? state.voteEndsAt - voteSeconds(state) * 1000 : Date.now()
       const ms = Math.max(0, Date.now() - opened)
       const ledger = [...(state.ledger || [])]
       if (inQuiz(state)) {

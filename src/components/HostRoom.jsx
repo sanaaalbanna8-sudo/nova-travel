@@ -116,7 +116,7 @@ export default function HostRoom({ identity, onLeave }) {
                 <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
                   الشريحة السابقة
                 </button>
-                {state.briefing === 1 && (
+                {SLIDES[state.briefing]?.id === 'guess' && (
                   <button
                     className="btn-ghost"
                     onClick={() => {

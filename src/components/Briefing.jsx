@@ -4,9 +4,10 @@ import { BRANCHES, REASONS, managerKey, managerName, roleById, WORKFLOW } from '
 import { HOST_NAME, LEVEL_STYLE } from '../config'
 
 export const SLIDES = [
-  { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
-  { id: 'guess', kicker: 'قبل الحالات', title: 'كشف الستار' },
+  { id: 'company', kicker: 'قبل الحالات', title: 'الشركة' },
   { id: 'pyramid', kicker: 'قبل الحالات', title: 'الهرم التنظيمي' },
+  { id: 'guess', kicker: 'قبل الحالات', title: 'كشف الستار' },
+  { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
   { id: 'flow', kicker: 'قبل الحالات', title: 'مسار الشغل' },
   { id: 'infer', kicker: 'قبل الحالات', title: 'أسئلة الاستنتاج' },
   { id: 'policy', kicker: 'معرفة سابقة · الهدف ج', title: 'السياسات والتهديدات' },
@@ -121,6 +122,31 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
       <h2>{slide.title}</h2>
 
       {step === 0 && (
+        <div className="company-intro">
+          <p>نوفا ترافل شركة حجوزات وسياحة وفنادق. بترتب الرحلات، والغرف، والأسعار، وبيانات الضيوف.</p>
+          <div className="company-facts">
+            <article>
+              <small>القطاع</small>
+              <strong>السياحة والسفر والضيافة</strong>
+            </article>
+            <article>
+              <small>الموظفات</small>
+              <strong>17 موظفة، ومديرة تنفيذية عامة</strong>
+            </article>
+            <article>
+              <small>الوظائف</small>
+              <strong>تخطيط، خدمة الضيف، البيانات، المال، وأمن الأنظمة</strong>
+            </article>
+            <article>
+              <small>المستويات</small>
+              <strong>استراتيجي، إداري، وتشغيلي</strong>
+            </article>
+          </div>
+          <p>هاي الجلسة اجتماع طارئ. في مشاكل مفتوحة اليوم، والقاعة لازم تحسمها قبل ما تكبر.</p>
+        </div>
+      )}
+
+      {step === 3 && (
         <div className="brief-org">
           <div className="org-chart">
             <div className="org-tier">
@@ -155,9 +181,9 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </div>
       )}
 
-      {step === 1 && <CurtainGame seat={seat} onCurtain={onCurtain} />}
+      {step === 2 && <CurtainGame seat={seat} onCurtain={onCurtain} />}
 
-      {step === 2 && (
+      {step === 1 && (
         <div className="pyramid">
           <div className="pyr-row is-apex">
             <article className="pyr-card is-host">
@@ -193,7 +219,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </div>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <div className="brief-org">
           <p>من أول معلومة لين القرار. كل بنت إلها جملة بشغلها على مسار البيانات.</p>
           <ol className="life-flow">
@@ -211,7 +237,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </div>
       )}
 
-      {step === 4 && (
+      {step === 5 && (
         <ol className="infer-list">
           <li>
             <b>مين مديرك المباشر؟</b>
@@ -232,7 +258,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </ol>
       )}
 
-      {step === 5 && (
+      {step === 6 && (
         <div className="brief-org">
           <p>من معرفتكم السابقة، قبل الحالات. الهدف ج: السياسة، والقانون، والأخلاق، وأمن المعلومة، والتهديد وكيف نخففه.</p>
           <ol className="infer-list">

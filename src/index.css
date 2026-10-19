@@ -963,7 +963,7 @@ input:focus-visible {
 
 .life-flow {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .life-flow li,
@@ -987,7 +987,11 @@ input:focus-visible {
   font-weight: 800;
 }
 
-.life-flow b { color: #0e7c84; }
+.life-flow b {
+  color: #0e7c84;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
 .life-flow span { color: #1c2433; font-size: 0.78rem; font-weight: 800; }
 
 .pyramid {

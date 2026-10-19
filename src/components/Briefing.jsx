@@ -176,7 +176,7 @@ export default function Briefing({ step = 0, onStep, seat = null }) {
 
       {step === 3 && (
         <div className="brief-org">
-          <p>من أول معلومة لين القرار. كل بنت إلها فعل واحد، على نفس نهج مسار البيانات.</p>
+          <p>من أول معلومة لين القرار. كل بنت إلها جملة بشغلها على مسار البيانات.</p>
           <ol className="life-flow">
             {WORKFLOW.map((item, index) => {
               const role = roleById(item.id)

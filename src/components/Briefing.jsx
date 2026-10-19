@@ -19,7 +19,7 @@ const FLOW = [
   ['غزل أبو الرب', 'تقرر'],
 ]
 
-export default function Briefing({ step = 0 }) {
+export default function Briefing({ step = 0, onStep }) {
   const slide = SLIDES[step] || SLIDES[0]
   const bands = [
     ['strategic', 'الاستراتيجي'],
@@ -29,17 +29,39 @@ export default function Briefing({ step = 0 }) {
 
   return (
     <section className="briefing">
+      <nav className="slide-tabs">
+        {SLIDES.map((item, index) => (
+          <button key={item.id} type="button" className={index === step ? 'is-on' : ''} onClick={() => onStep?.(index)}>
+            <b>{index + 1}</b>
+            {item.title}
+          </button>
+        ))}
+      </nav>
       <p className="case-label">{slide.kicker}</p>
       <h2>{slide.title}</h2>
 
       {step === 0 && (
         <div className="brief-org">
-          <p>
-            سناء البنا هي المديرة التنفيذية العامة. تحتها سبع عشرة وظيفة، وكل وظيفة عليها بنت. المقعد 3 كان فاضي، ووظيفته ما أخذتها بنت: مهندسة الواجهات الأمامية ولوحات معلومات المسافرين. كندة بطاح سكّرت هذا المقعد. من غيرها البيانات تنجمع وتنحفظ، والمسافر والاستقبال والمدير يشوفون شاشة واحدة ما بتسعفهم.
-          </p>
-          <p>
-            الشركة بهالتشكيل تقدر تشتغل. في من يجمع، ومن يفحص، ومن ينظّف، ومن يسجّل التغيير، ومن يحفظ، ومن يحسب، ومن يعرض، ومن يقرر، ومن يواجه الضيف، ومن يحمي المصاري والناس والقانون.
-          </p>
+          <div className="org-tree">
+            <article className="pyr-card is-host">
+              <small>الإدارة العليا</small>
+              <strong>Sanaa Albanna</strong>
+              <span>المدير التنفيذي العام</span>
+            </article>
+            <div className="org-bands">
+              {bands.map(([level, label]) => (
+                <section key={level} className={`pyr-band lv-${level}`}>
+                  <p>{label}</p>
+                  {roles
+                    .filter((role) => role.level === level)
+                    .map((role) => (
+                      <span key={role.id}>{role.title}</span>
+                    ))}
+                </section>
+              ))}
+            </div>
+          </div>
+          <p>الشركة تقف على هذه الوظائف. كل وظيفة عليها بنت، والمقعد 3 لكندة: مهندسة الواجهات الأمامية ولوحات معلومات المسافرين.</p>
           <ol className="life-flow">
             {FLOW.map(([name, verb]) => (
               <li key={name}>

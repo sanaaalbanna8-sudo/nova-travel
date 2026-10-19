@@ -61,6 +61,8 @@ export default function HostRoom({ identity, onLeave }) {
     )
   }
 
+  const opening = state.briefing !== null && state.briefing !== undefined
+
   const askMove = (action) => {
     const dirty = state.phase !== 'discuss' || voteCount > 0
     if (!dirty) {
@@ -87,11 +89,11 @@ export default function HostRoom({ identity, onLeave }) {
 
   return (
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 4}>
-      <div className="board">
-        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={state.briefing === null ? item.addressedTo : null} />}
-        <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
-          {state.briefing !== null && state.briefing !== undefined ? (
-            <Briefing step={state.briefing} />
+      <div className={`board ${opening ? 'is-opening' : ''}`}>
+        {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
+        <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>
+          {opening ? (
+            <Briefing step={state.briefing} onStep={(step) => send({ type: 'brief', step })} />
           ) : (
             <>
               <CaseCard item={item} mode="story" />
@@ -103,7 +105,7 @@ export default function HostRoom({ identity, onLeave }) {
             </>
           )}
           <div className="board-dock">
-            {state.briefing !== null && state.briefing !== undefined ? (
+            {opening ? (
               <>
                 <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
                   الشريحة السابقة
@@ -146,7 +148,7 @@ export default function HostRoom({ identity, onLeave }) {
               </>
             )}
             <span className="me-auto text-xs font-bold text-mist">
-              {state.briefing !== null && state.briefing !== undefined
+              {opening
                 ? `${['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]} · ${state.briefing + 1} / 4`
                 : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
             </span>

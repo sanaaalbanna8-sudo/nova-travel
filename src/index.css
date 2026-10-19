@@ -612,10 +612,77 @@ input:focus-visible {
   background: rgba(255, 255, 255, 0.9);
 }
 
+.board.is-opening {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.slide-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.slide-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  color: #1c2433;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: right;
+  box-shadow: inset 0 0 0 1px #e4ebf3;
+  cursor: pointer;
+}
+
+.slide-tabs button b {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  place-items: center;
+  border-radius: 9px;
+  background: #e7eef8;
+}
+
+.slide-tabs button.is-on {
+  background: #fff8ea;
+  box-shadow: inset 0 0 0 2px #c9a227;
+}
+
+.org-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.org-bands {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.org-bands .pyr-band span {
+  display: block;
+  margin-top: 4px;
+  color: #1c2433;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .briefing h2 {
   margin: 0 0 8px;
   font-family: Amiri, Cairo, serif;
-  font-size: clamp(1.6rem, 2.4vw, 2.3rem);
+  font-size: clamp(2rem, 4vw, 3.2rem);
 }
 
 .brief-org p,

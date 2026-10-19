@@ -46,6 +46,7 @@ export default function StudentRoom({ identity, onLeave }) {
     )
   }
 
+  const opening = state.briefing !== null && state.briefing !== undefined
   const item = cases[state.caseIndex] || cases[0]
   const myVote = state.votes ? state.votes[String(role.id)] || null : state.myVote || null
   const summary = state.phase === 'results' ? state.summary || summarize(state.votes || {}, roles) : null
@@ -53,10 +54,10 @@ export default function StudentRoom({ identity, onLeave }) {
 
   return (
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage progress={(state.caseIndex + 1) / cases.length}>
-      <div className="board board-student">
+      <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
-          {state.briefing !== null && state.briefing !== undefined ? (
-            <Briefing step={state.briefing} />
+          {opening ? (
+            <Briefing step={state.briefing} onStep={(step) => send({ type: 'brief', step })} />
           ) : (
             <>
           <CaseCard item={item} mode="story" />
@@ -78,7 +79,7 @@ export default function StudentRoom({ identity, onLeave }) {
             <strong className="text-sm text-ink">{role.name}</strong>
             <span className="text-xs font-bold text-faint">{role.title}</span>
             <span className="me-auto text-xs font-bold text-mist">
-              {state.briefing !== null && state.briefing !== undefined
+              {opening
                 ? ['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]
                 : state.phase === 'discuss'
                   ? Number(item.addressedTo) === role.id

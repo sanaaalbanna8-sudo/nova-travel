@@ -9,7 +9,7 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
   const showChoices = mode !== 'story'
   const hostCase = item.addressedTo === 'host'
   const seat = roles.find((role) => role.id === Number(item.addressedTo))
-  const concern = hostCase ? 'يا سناء، هالمشكلة عندك.' : `يا ${seat?.nameAr}، هالمشكلة إلك.`
+  const concern = hostCase ? '' : `يا ${seat?.nameAr}، هالمشكلة إلك.`
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <RoleMark who={item.roleKey || item.addressedTo} name={item.addressedLabel} title={item.addressedTitle} host={hostCase} />
             <div>
               <h2>{item.title}</h2>
-              <p className="case-job">{concern}</p>
+              {concern && <p className="case-job">{concern}</p>}
             </div>
           </div>
           {item.paragraphs.map((paragraph) => (

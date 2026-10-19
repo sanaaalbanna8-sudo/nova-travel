@@ -111,7 +111,24 @@ export function apply(state, action, caseCount) {
       if (state.phase !== PHASE.voting) return state
       return touch({ ...state, phase: PHASE.results, timerEndsAt: null, voteEndsAt: null })
     case 'goto':
-      if (inQuiz(state)) return state
+      if (inQuiz(state)) {
+        const index = action.caseIndex
+        if (!Number.isInteger(index) || index < 0 || index >= caseCount) return state
+        const saved = state.history?.[index]
+        const phase = saved?.phase || PHASE.discuss
+        return touch({
+          ...state,
+          quizHistory: rememberQuiz(state),
+          quizIndex: null,
+          caseIndex: index,
+          phase,
+          votes: saved?.votes ? { ...saved.votes } : {},
+          advice: saved?.advice || null,
+          voteEndsAt: saved?.voteEndsAt || null,
+          timerEndsAt: null,
+          discussStartedAt: phase === PHASE.discuss ? Date.now() : state.discussStartedAt || null,
+        })
+      }
       return moveTo(state, action.caseIndex, caseCount)
     case 'next':
       if (inQuiz(state)) return moveQuiz(state, state.quizIndex + 1)
@@ -208,8 +225,12 @@ export function apply(state, action, caseCount) {
       return touch({ ...state, timerEndsAt })
     }
     case 'quiz-start': {
-      if (inQuiz(state)) return state
-      const index = Number.isInteger(state.quizIndex) ? state.quizIndex : 0
+      const requested = Number.isInteger(action.quizIndex) && action.quizIndex >= 0 && action.quizIndex <= QUIZ_MAX ? action.quizIndex : null
+      if (inQuiz(state)) {
+        if (requested === null || requested === state.quizIndex) return state
+        return moveQuiz(state, requested)
+      }
+      const index = requested !== null ? requested : Number.isInteger(state.quizIndex) ? state.quizIndex : 0
       const fromCases = typeof state.briefing !== 'number'
       const history = fromCases ? { ...state.history, [state.caseIndex]: snapshot(state) } : state.history
       const quizHistory = state.quizHistory || {}

@@ -147,6 +147,7 @@ export function useMeeting(identity) {
             step: action.step,
             studentId: action.studentId,
             guess: action.guess,
+            quizIndex: action.quizIndex,
           }),
         )
       }

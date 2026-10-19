@@ -204,6 +204,7 @@ wss.on('connection', (ws) => {
         step: message.step === undefined ? undefined : message.step,
         studentId: message.studentId,
         guess: message.guess,
+        quizIndex: Number.isInteger(message.quizIndex) ? message.quizIndex : undefined,
       }
       if (action.type === 'advise' && cases[meeting.caseIndex]?.addressedTo !== 'host') return
       commit(apply(meeting, action, cases.length))

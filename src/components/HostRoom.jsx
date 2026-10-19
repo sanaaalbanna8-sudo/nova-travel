@@ -217,8 +217,11 @@ export default function HostRoom({ identity, onLeave }) {
                 <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
                   إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
                 </button>
-                <button className="btn-ghost" disabled={state.caseIndex === 0} onClick={() => askMove({ type: 'prev' })}>
-                  السابقة
+                <button
+                  className="btn-ghost"
+                  onClick={() => askMove(state.caseIndex === 0 ? { type: 'quiz-start', quizIndex: QUIZZES.length - 1 } : { type: 'prev' })}
+                >
+                  {state.caseIndex === 0 ? 'الأسئلة السريعة' : 'السابقة'}
                 </button>
                 <button className="btn-ghost" disabled={state.caseIndex === cases.length - 1} onClick={() => askMove({ type: 'next' })}>
                   التالية
@@ -284,13 +287,8 @@ export default function HostRoom({ identity, onLeave }) {
               شرائح التعريف
             </button>
             <button className="btn-ghost w-full" onClick={() => send({ type: 'quiz-start' })}>
-              أسئلة سريعة
+              الأسئلة السريعة
             </button>
-            {(opening || quizzing) && (
-              <button className="btn-ghost w-full" onClick={() => send({ type: 'quiz-end' })}>
-                ابدئي الحالات
-              </button>
-            )}
             <button className="btn-ghost w-full" onClick={() => setModal('roles')}>
               دليل الأدوار
             </button>
@@ -329,6 +327,27 @@ export default function HostRoom({ identity, onLeave }) {
               </button>
             ))}
           </div>
+          {topic === 'الكل' && (
+            <div className="mb-4 grid gap-2">
+              <p className="text-sm font-extrabold text-gold2">الأسئلة السريعة، قبل الحالات</p>
+              {QUIZZES.map((entry) => {
+                const current = quizzing && state.quizIndex === entry.id - 1
+                const done = (state.ledger || []).some((row) => row.kind === 'quiz' && row.quizId === entry.id)
+                return (
+                  <button
+                    key={entry.id}
+                    className={`rounded-2xl border px-4 py-3 text-right ${current ? 'border-gold bg-gold/10' : 'border-line bg-paper'}`}
+                    onClick={() => askMove({ type: 'quiz-start', quizIndex: entry.id - 1 })}
+                  >
+                    <span className="text-xs text-gold">سؤال {entry.id}</span>
+                    <span className="mt-1 block font-semibold text-ink">{entry.question}</span>
+                    <span className="mt-1 block text-xs text-faint">{done ? 'تم التصويت' : 'قبل الحالات'}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {topic === 'الكل' && <p className="mb-2 text-sm font-extrabold text-ink">الحالات</p>}
           <div className="grid gap-2">
             {cases
               .filter((entry) => topic === 'الكل' || entry.topics.includes(topic))
@@ -437,7 +456,9 @@ export default function HostRoom({ identity, onLeave }) {
               ? 'سيُمسح تقدم الاجتماع كله، بما فيه نتائج الحالات السابقة المحفوظة على هذا الخادم.'
               : pending.type === 'clear-votes'
                 ? 'ستُمسح أصوات الحالة الحالية ويُغلق باب التصويت من جديد.'
-                : 'سيُحفظ تصويت الحالة الحالية، ثم تُفتح الحالة الأخرى بحالتها المحفوظة إن وُجدت.'}
+                : pending.type === 'quiz-start'
+                  ? 'سيُحفظ تصويت الحالة الحالية، ثم تفتح الأسئلة السريعة التي قبل الحالات.'
+                  : 'سيُحفظ تصويت الحالة الحالية، ثم تُفتح الحالة الأخرى بحالتها المحفوظة إن وُجدت.'}
           </p>
           <div className="mt-5 flex gap-3">
             <button

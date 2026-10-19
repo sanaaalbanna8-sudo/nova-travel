@@ -6,6 +6,7 @@ export const PHASE = {
 
 export const CHOICES = ['A', 'B', 'C']
 export const VOTE_SECONDS = 12
+export const BRIEF_MAX = 4
 
 export function createState() {
   return {
@@ -140,7 +141,7 @@ export function apply(state, action, caseCount) {
     }
     case 'brief': {
       const step = action.step
-      if (step !== null && step !== 0 && step !== 1 && step !== 2 && step !== 3) return state
+      if (step !== null && (!Number.isInteger(step) || step < 0 || step > BRIEF_MAX)) return state
       if (state.briefing === step) return state
       if (step === null) {
         return touch({

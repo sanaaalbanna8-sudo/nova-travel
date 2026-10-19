@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import cases from '../data/cases.json'
 import roles from '../data/roles.json'
 import { BRAND_EN, LEVEL_STYLE, MEETING_AR, MEETING_EN, PHASE_LABEL } from '../config'
+import { managerName } from '../data/org.js'
+import { SLIDES } from './Briefing'
 import { summarize } from '../../shared/meeting.js'
 import { useMeeting } from '../hooks/useMeeting'
 import { Shell, useCountdown, useElapsed } from './Shell'
@@ -59,7 +61,7 @@ export default function StudentRoom({ identity, onLeave }) {
   const votingOpen = state.phase === 'voting'
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage clock={elapsed} progress={opening ? (state.briefing + 1) / 4 : (state.caseIndex + 1) / cases.length}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage clock={elapsed} progress={opening ? (state.briefing + 1) / SLIDES.length : (state.caseIndex + 1) / cases.length}>
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
@@ -84,9 +86,10 @@ export default function StudentRoom({ identity, onLeave }) {
             <span className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</span>
             <strong className="text-sm text-ink">{role.name}</strong>
             <span className="text-xs font-bold text-faint">{role.title}</span>
+            <span className="text-xs font-extrabold text-sea">مديرتك: {managerName(role.id)}</span>
             <span className="me-auto text-xs font-bold text-mist">
               {opening
-                ? ['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]
+                ? SLIDES[state.briefing]?.title
                 : state.phase === 'discuss'
                   ? Number(item.addressedTo) === role.id
                     ? 'هالمشكلة إلك'

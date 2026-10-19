@@ -10,7 +10,7 @@ import { armVoteSound, playVoteOpen } from '../lib/voteSound'
 import CaseCard from './CaseCard'
 import Roster from './Roster'
 import VoteStage from './VoteStage'
-import Briefing from './Briefing'
+import Briefing, { SLIDES } from './Briefing'
 
 export default function HostRoom({ identity, onLeave }) {
   const meeting = useMeeting(identity)
@@ -90,7 +90,7 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 4}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / SLIDES.length}>
       <div className={`board ${opening ? 'is-opening' : ''}`}>
         {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
         <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>
@@ -112,9 +112,9 @@ export default function HostRoom({ identity, onLeave }) {
                 <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
                   الشريحة السابقة
                 </button>
-                {state.briefing < 3 ? (
+                {state.briefing < SLIDES.length - 1 ? (
                   <button className="btn-gold" onClick={() => send({ type: 'brief', step: state.briefing + 1 })}>
-                    {['الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]}
+                    {SLIDES[state.briefing + 1].title}
                   </button>
                 ) : (
                   <button className="btn-gold" onClick={() => send({ type: 'brief', step: null })}>
@@ -151,7 +151,7 @@ export default function HostRoom({ identity, onLeave }) {
             )}
             <span className="me-auto text-xs font-bold text-mist">
               {opening
-                ? `${['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]} · ${state.briefing + 1} / 4`
+                ? `${SLIDES[state.briefing].title} · ${state.briefing + 1} / ${SLIDES.length}`
                 : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
             </span>
             {!present && (

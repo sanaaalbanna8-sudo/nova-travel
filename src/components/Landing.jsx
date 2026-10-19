@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import roles from '../data/roles.json'
 import { BRAND_AR, BRAND_EN, LEVEL_STYLE, MEETING_AR, MEETING_EN } from '../config'
+import { managerName } from '../data/org.js'
 import { Mark } from './Shell'
 
 export default function Landing({ gate = 'student', error = '', onHost, onStudent }) {
@@ -67,6 +68,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
           <p className="mt-4 text-sm text-faint">الرقم {role.id}</p>
           <h2 className="mt-2 font-display text-4xl leading-snug text-ink">{role.name}</h2>
           <p className="mt-2 text-lg font-extrabold text-ink">{role.title}</p>
+          <p className="mt-2 text-sm font-extrabold text-sea">مديرتك المباشرة: {managerName(role.id)}</p>
           <p className="mt-4 leading-8 text-mist">{role.mandate}</p>
           <ul className="mt-4 space-y-2 text-sm leading-7 text-mist">
             {role.duties.map((duty) => (

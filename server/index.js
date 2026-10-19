@@ -5,7 +5,7 @@ import { createServer } from 'http'
 import { fileURLToPath } from 'url'
 import express from 'express'
 import { WebSocketServer } from 'ws'
-import { apply, createState, PHASE, summarize, votedCaseIndexes } from '../shared/meeting.js'
+import { apply, BRIEF_MAX, createState, PHASE, summarize, votedCaseIndexes } from '../shared/meeting.js'
 import { loadJson, validateData } from './check-data.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -44,7 +44,7 @@ function normalize(raw) {
   if (!['A', 'B', 'C'].includes(next.advice)) next.advice = null
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
-  if (next.briefing !== null && next.briefing !== 0 && next.briefing !== 1 && next.briefing !== 2 && next.briefing !== 3) next.briefing = 0
+  if (next.briefing !== null && (!Number.isInteger(next.briefing) || next.briefing < 0 || next.briefing > BRIEF_MAX)) next.briefing = 0
   if (!Array.isArray(next.ledger)) next.ledger = []
   return next
 }

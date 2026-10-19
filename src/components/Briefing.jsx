@@ -1,41 +1,35 @@
 import roles from '../data/roles.json'
+import { BRANCHES, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME, LEVEL_STYLE } from '../config'
 
-const SLIDES = [
+export const SLIDES = [
   { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
   { id: 'pyramid', kicker: 'قبل الحالات', title: 'الهرم التنظيمي' },
+  { id: 'flow', kicker: 'قبل الحالات', title: 'مسار الشغل' },
   { id: 'infer', kicker: 'قبل الحالات', title: 'أسئلة الاستنتاج' },
   { id: 'policy', kicker: 'معرفة سابقة · الهدف ج', title: 'السياسات والتهديدات' },
 ]
 
-const FLOW = [
-  ['فرح النتشة', 'تجمع'],
-  ['ريتال الحيت', 'تفحص'],
-  ['سما إكبارية', 'تنظّف'],
-  ['جنى دروزة', 'تسجّل'],
-  ['سلمى الحموز', 'تحفظ'],
-  ['جود العساف', 'تحسب'],
-  ['كندة بطاح', 'تعرض'],
-  ['غزل أبو الرب', 'تقرر'],
+const BANDS = [
+  ['strategic', 'الاستراتيجي'],
+  ['management', 'الإداري'],
+  ['operational', 'التشغيلي'],
 ]
 
-function SeatBox({ role, level }) {
+function OrgCard({ role, boss }) {
   return (
-    <article className={`org-card lv-${level || role.level}`}>
+    <article className={`org-card lv-${role.level}`}>
       <strong>{role.nameAr}</strong>
       <b>{role.name}</b>
       <span>{role.title}</span>
+      {boss && <em>مديرتها: {boss}</em>}
     </article>
   )
 }
 
 export default function Briefing({ step = 0, onStep }) {
   const slide = SLIDES[step] || SLIDES[0]
-  const bands = [
-    ['strategic', 'الاستراتيجي'],
-    ['management', 'الإداري'],
-    ['operational', 'التشغيلي'],
-  ]
+  const ghazal = roleById(4)
 
   return (
     <section className="briefing">
@@ -61,27 +55,29 @@ export default function Briefing({ step = 0, onStep }) {
                 <span>المدير التنفيذي العام</span>
               </article>
             </div>
-            {bands.map(([level, label]) => (
-              <div key={level} className={`org-tier lv-${level}`}>
-                <p className="org-level">{label}</p>
-                <div className="org-line">
-                  {roles
-                    .filter((role) => role.level === level)
-                    .map((role) => (
-                      <SeatBox key={role.id} role={role} level={level} />
-                    ))}
-                </div>
-              </div>
-            ))}
+            <div className="org-tier">
+              <OrgCard role={ghazal} boss={HOST_NAME} />
+            </div>
+            <div className="org-branches">
+              {BRANCHES.map((branch) => {
+                const lead = roleById(branch.lead)
+                return (
+                  <div key={branch.lead} className={`org-branch ${branch.team.length > 2 ? 'is-wide' : ''}`}>
+                    <OrgCard role={lead} boss={managerName(lead.id)} />
+                    {branch.team.length > 0 && (
+                      <div className="org-kids">
+                        {branch.team.map((id) => {
+                          const role = roleById(id)
+                          return <OrgCard key={id} role={role} boss={managerName(id)} />
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <ol className="life-flow">
-            {FLOW.map(([name, verb]) => (
-              <li key={name}>
-                <b>{verb}</b>
-                <span>{name}</span>
-              </li>
-            ))}
-          </ol>
+          <p>غزل هي المدير التنفيذي، وفوق إيمان وروز. تحت كل اسم مكتوب: مديرتها.</p>
         </div>
       )}
 
@@ -95,12 +91,19 @@ export default function Briefing({ step = 0, onStep }) {
               <span>المدير التنفيذي العام</span>
             </article>
           </div>
-          {bands.map(([level, label], index) => (
+          <div className="pyr-row is-ceo">
+            <article className="pyr-card lv-strategic">
+              <strong>{ghazal.nameAr}</strong>
+              <b>{ghazal.name}</b>
+              <span>{ghazal.title}</span>
+            </article>
+          </div>
+          {BANDS.map(([level, label], index) => (
             <div key={level} className={`pyr-row is-${index + 2} lv-${level}`}>
               <p>{label}</p>
               <div>
                 {roles
-                  .filter((role) => role.level === level)
+                  .filter((role) => role.level === level && role.id !== 4)
                   .map((role) => (
                     <article key={role.id} className="pyr-card">
                       <strong>{role.nameAr}</strong>
@@ -115,10 +118,28 @@ export default function Briefing({ step = 0, onStep }) {
       )}
 
       {step === 2 && (
+        <div className="brief-org">
+          <p>من أول معلومة لين القرار. كل بنت إلها فعل واحد، على نفس نهج مسار البيانات.</p>
+          <ol className="life-flow">
+            {WORKFLOW.map((item, index) => {
+              const role = roleById(item.id)
+              return (
+                <li key={role.id}>
+                  <i>{index + 1}</i>
+                  <b>{item.verb}</b>
+                  <span>{role.nameAr}</span>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
+      )}
+
+      {step === 3 && (
         <ol className="infer-list">
           <li>
             <b>مين مديرك المباشر؟</b>
-            <span>انظري لمكانك في الهرم، وسمّي الشخص الذي تسلّمينه شغلك.</span>
+            <span>انظري لصندوقك في الهيكل التنظيمي. تحت اسمك مكتوب: مديرتها.</span>
           </li>
           <li>
             <b>لو الشركة حقيقية، شو أول مهمة لك هذا الأسبوع؟</b>
@@ -135,7 +156,7 @@ export default function Briefing({ step = 0, onStep }) {
         </ol>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <div className="brief-org">
           <p>من معرفتكم السابقة، قبل الحالات. الهدف ج: السياسة، والقانون، والأخلاق، وأمن المعلومة، والتهديد وكيف نخففه.</p>
           <ol className="infer-list">

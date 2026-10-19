@@ -86,7 +86,7 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 3}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 4}>
       <div className="board">
         {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={state.briefing === null ? item.addressedTo : null} />}
         <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
@@ -108,9 +108,9 @@ export default function HostRoom({ identity, onLeave }) {
                 <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
                   الشريحة السابقة
                 </button>
-                {state.briefing < 2 ? (
+                {state.briefing < 3 ? (
                   <button className="btn-gold" onClick={() => send({ type: 'brief', step: state.briefing + 1 })}>
-                    الشريحة التالية
+                    {['الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]}
                   </button>
                 ) : (
                   <button className="btn-gold" onClick={() => send({ type: 'brief', step: null })}>
@@ -147,7 +147,7 @@ export default function HostRoom({ identity, onLeave }) {
             )}
             <span className="me-auto text-xs font-bold text-mist">
               {state.briefing !== null && state.briefing !== undefined
-                ? `التعريف ${state.briefing + 1} / 3`
+                ? `${['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]} · ${state.briefing + 1} / 4`
                 : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
             </span>
             {!present && (

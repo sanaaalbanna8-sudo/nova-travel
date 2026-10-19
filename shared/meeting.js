@@ -117,7 +117,7 @@ export function apply(state, action, caseCount) {
     }
     case 'brief': {
       const step = action.step
-      if (step !== null && step !== 0 && step !== 1 && step !== 2) return state
+      if (step !== null && step !== 0 && step !== 1 && step !== 2 && step !== 3) return state
       if (state.briefing === step) return state
       if (step === null) {
         return touch({

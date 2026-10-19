@@ -45,7 +45,7 @@ function normalize(raw) {
   if (!['A', 'B', 'C'].includes(next.advice)) next.advice = null
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
-  if (next.briefing !== null && next.briefing !== 0 && next.briefing !== 1 && next.briefing !== 2) next.briefing = 0
+  if (next.briefing !== null && next.briefing !== 0 && next.briefing !== 1 && next.briefing !== 2 && next.briefing !== 3) next.briefing = 0
   return next
 }
 

@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Eman Mohammad Al-Draghma",
+    "name": "EMAN MOHAMMAD AL-DRAGHMA",
     "nameAr": "إيمان الدراغمة",
     "title": "مديرة السياسات، القوانين، والمناطق الزمنية",
     "titleEn": "Director of Policies, Regulations, and Time Zones",
@@ -16,7 +16,7 @@
   },
   {
     "id": 2,
-    "name": "Jana Mu'taz Elmughrabi",
+    "name": "JANA MU'TAZ ELMUGHRABI",
     "nameAr": "جنى المغربي",
     "title": "مديرة خدمة العملاء وأصحاب المصلحة",
     "titleEn": "Director of Customer Service and Stakeholders",
@@ -31,7 +31,7 @@
   },
   {
     "id": 3,
-    "name": "Kendah Ammar Battah",
+    "name": "KENDAH AMMAR BATTAH",
     "nameAr": "كندة بطاح",
     "title": "مهندسة الواجهات الأمامية ولوحات معلومات المسافرين",
     "titleEn": "Front-End Engineer and Traveler Dashboards",
@@ -46,7 +46,7 @@
   },
   {
     "id": 4,
-    "name": "Ghazal Raid Abu Al Rob",
+    "name": "GHAZAL RAID ABU AL ROB",
     "nameAr": "غزل أبو الرب",
     "title": "المدير التنفيذي لشركة نوفا",
     "titleEn": "Chief Executive Officer",
@@ -61,7 +61,7 @@
   },
   {
     "id": 5,
-    "name": "Sama Ahmad Ikbarieh",
+    "name": "SAMA AHMAD IKBARIEH",
     "nameAr": "سما إكبارية",
     "title": "مسؤولة تطهير بيانات الحجوزات وجودتها",
     "titleEn": "Officer of Booking Data Cleansing and Quality",
@@ -76,7 +76,7 @@
   },
   {
     "id": 6,
-    "name": "Marah Montaser Shraideh",
+    "name": "MARAH MONTASER SHRAIDEH",
     "nameAr": "مرح شريدة",
     "title": "مديرة تقييم المخاطر وتسريب البيانات",
     "titleEn": "Director of Risk Assessment and Data Leakage",
@@ -91,7 +91,7 @@
   },
   {
     "id": 7,
-    "name": "Rose Samir F. Najjar",
+    "name": "ROSE SAMIR F. NAJJAR",
     "nameAr": "روز نجار",
     "title": "مديرة التخطيط الاستراتيجي ومراقبة السوق السياحي",
     "titleEn": "Director of Strategic Planning and Tourism Market Monitoring",
@@ -106,7 +106,7 @@
   },
   {
     "id": 8,
-    "name": "Joud Ahmad Al-Assaf",
+    "name": "JOUD AHMAD AL-ASSAF",
     "nameAr": "جود العساف",
     "title": "مسؤولة استخراج البيانات والنماذج العددية",
     "titleEn": "Officer of Data Extraction and Numerical Modelling",
@@ -121,7 +121,7 @@
   },
   {
     "id": 9,
-    "name": "Lamar Khaldoun Al Dewari",
+    "name": "LAMAR KHALDOUN AL DEWARI",
     "nameAr": "لمار الدويري",
     "title": "مديرة المخزون السياحي ونظام الحجز في الوقت المناسب",
     "titleEn": "Director of Tourism Inventory and Just-in-Time Booking",
@@ -136,7 +136,7 @@
   },
   {
     "id": 10,
-    "name": "Salma Riyad Al-Hmouz",
+    "name": "SALMA RIYAD AL-HMOUZ",
     "nameAr": "سلمى الحموز",
     "title": "مديرة قواعد البيانات والواجهة الخلفية",
     "titleEn": "Director of Databases and Back-End",
@@ -151,7 +151,7 @@
   },
   {
     "id": 11,
-    "name": "Sara Ziad Atieyh",
+    "name": "SARA ZIAD ATIEYH",
     "nameAr": "سارة عطية",
     "title": "مديرة الشؤون الإدارية والموارد البشرية",
     "titleEn": "Director of Administration and Human Resources",
@@ -166,7 +166,7 @@
   },
   {
     "id": 12,
-    "name": "Farah Amer Ali Natsheh",
+    "name": "FARAH AMER ALI NATSHEH",
     "nameAr": "فرح نتشة",
     "title": "مسؤولة جمع البيانات الأولية للمسافرين",
     "titleEn": "Officer of Primary Traveler Data Collection",
@@ -181,7 +181,7 @@
   },
   {
     "id": 13,
-    "name": "Layan Yazan Alzawahra",
+    "name": "LAYAN YAZAN ALZAWAHRA",
     "nameAr": "ليان الزواهرة",
     "title": "مديرة المجتمعات الرقمية ووسائل التواصل",
     "titleEn": "Director of Digital Communities and Social Media",
@@ -196,7 +196,7 @@
   },
   {
     "id": 14,
-    "name": "Jana Mah'd Fuad Darwazeh",
+    "name": "JANA MAH'D FUAD DARWAZEH",
     "nameAr": "جنى دروزة",
     "title": "مسؤولة مصادر البيانات الثانوية وسجل التدقيق",
     "titleEn": "Officer of Secondary Data Sources and Audit Trail",
@@ -211,7 +211,7 @@
   },
   {
     "id": 15,
-    "name": "Rital Mohammad Al-Heet",
+    "name": "RITAL MOHAMMAD AL-HEET",
     "nameAr": "ريتال الهيت",
     "title": "مسؤولة المدخلات والتحقق من الصحة",
     "titleEn": "Officer of Inputs and Validation",
@@ -226,7 +226,7 @@
   },
   {
     "id": 16,
-    "name": "Malak Mahdi Gouda",
+    "name": "MALAK MAHDI GOUDA",
     "nameAr": "ملك جودة",
     "title": "مسؤولة التحليل المالي والتدفق النقدي",
     "titleEn": "Financial Analysis and Cash Flow Officer",
@@ -241,7 +241,7 @@
   },
   {
     "id": 17,
-    "name": "Dilara Luay Nusier",
+    "name": "DILARA LUAY NUSIER",
     "nameAr": "ديلارا نصير",
     "title": "مديرة أمن الأنظمة واختيار حلول تكنولوجيا المعلومات",
     "titleEn": "Director of Systems Security and IT Solutions",

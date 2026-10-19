@@ -79,11 +79,11 @@ export default function StudentRoom({ identity, onLeave }) {
             <span className="text-xs font-bold text-faint">{role.title}</span>
             <span className="me-auto text-xs font-bold text-mist">
               {state.briefing !== null && state.briefing !== undefined
-                ? 'قبل الحالات: الهيكل ثم الهرم ثم السؤال'
+                ? ['الهيكل التنظيمي', 'الهرم التنظيمي', 'أسئلة الاستنتاج', 'السياسات والتهديدات'][state.briefing]
                 : state.phase === 'discuss'
                   ? Number(item.addressedTo) === role.id
-                    ? 'رأيك الآن شفهي، والتصويت مع الكل'
-                    : `نسمع رأي ${item.addressedLabel} شفهياً`
+                    ? 'هالمشكلة إلك'
+                    : PHASE_LABEL[state.phase]
                   : PHASE_LABEL[state.phase]}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''}
             </span>

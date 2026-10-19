@@ -1,7 +1,7 @@
 export const HOST_NAME = 'سناء البنا'
 export const LOCAL_HOST_PIN = import.meta.env.VITE_HOST_PIN || 'NOVA-BTEC'
 export const STORAGE_IDENTITY = 'nova-identity'
-export const STORAGE_LOCAL = 'nova-meeting-local-v1'
+export const STORAGE_LOCAL = 'nova-meeting-local-v2'
 
 export const BRAND_AR = 'نوفا ترافل'
 export const BRAND_EN = 'Nova Travel'

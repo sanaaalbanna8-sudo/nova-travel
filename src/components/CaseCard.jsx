@@ -1,3 +1,4 @@
+import roles from '../data/roles.json'
 import { CHOICE_STYLE, LEVEL_STYLE } from '../config'
 import RoleMark from './RoleMark'
 
@@ -7,6 +8,8 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
   const showStory = mode !== 'choices'
   const showChoices = mode !== 'story'
   const hostCase = item.addressedTo === 'host'
+  const seat = roles.find((role) => role.id === Number(item.addressedTo))
+  const concern = hostCase ? 'يا سناء، هالمشكلة عندك.' : `يا ${seat?.nameAr}، هالمشكلة إلك.`
 
   return (
     <>
@@ -18,15 +21,10 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
           <div className="case-speak">
-            <RoleMark who={item.roleKey || item.addressedTo} name={item.addressedLabel} host={hostCase} />
+            <RoleMark who={item.roleKey || item.addressedTo} name={item.addressedLabel} title={item.addressedTitle} host={hostCase} />
             <div>
               <h2>{item.title}</h2>
-              <p className="case-job">{item.addressedTitle}</p>
-              <p className="case-who">
-                {hostCase
-                  ? 'بتحكي رأيك بالقاعة، وبعدين بتفتحي التصويت وإحنا كلنا بنصوّت.'
-                  : `${item.addressedLabel} بتحكي رأيها بالقاعة، وبعدين لما ينفتح التصويت بتصوّت معنا كلنا.`}
-              </p>
+              <p className="case-job">{concern}</p>
             </div>
           </div>
           {item.paragraphs.map((paragraph) => (

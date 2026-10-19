@@ -174,7 +174,7 @@ function Scene({ kind }) {
   )
 }
 
-export default function RoleMark({ who, name, host = false }) {
+export default function RoleMark({ who, name, title, host = false }) {
   const kind = SCENES[who] || 'seal'
   return (
     <figure className={`role-mark ${host ? 'is-host' : ''}`}>
@@ -183,7 +183,7 @@ export default function RoleMark({ who, name, host = false }) {
         <Scene kind={kind} />
       </svg>
       <figcaption>
-        <small>{host ? 'المدير العام · رأي شفهي' : 'الرأي شفهي'}</small>
+        <small>{title}</small>
         <strong>{name}</strong>
       </figcaption>
     </figure>

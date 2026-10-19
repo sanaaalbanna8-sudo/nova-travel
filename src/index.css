@@ -473,15 +473,21 @@ input:focus-visible {
 .board-names span em {
   display: block;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-style: normal;
+}
+
+.board-names span strong {
+  white-space: normal;
+  font-size: 0.58rem;
+  line-height: 1.15;
 }
 
 .board-names span em {
   color: #5c6778;
   font-size: 0.58rem;
   font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .board-names i {
@@ -529,7 +535,7 @@ input:focus-visible {
   flex: none;
   align-items: center;
   gap: 10px;
-  width: min(340px, 46%);
+  width: min(420px, 52%);
   margin: 0;
   padding: 8px 12px 8px 8px;
   border-radius: 22px;
@@ -566,8 +572,9 @@ input:focus-visible {
 .role-mark strong {
   display: block;
   color: #1c2433;
-  font-size: 0.95rem;
+  font-size: 0.78rem;
   line-height: 1.35;
+  letter-spacing: 0.01em;
 }
 
 .case-story h2 {

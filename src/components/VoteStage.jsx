@@ -105,7 +105,7 @@ export default function VoteStage({ item, phase, endsAt, votes }) {
       <div className="vote-stage-copy">
         <p className="text-xs tracking-[0.18em] text-gold2">{reveal ? 'النتائج' : 'باب التصويت'}</p>
         <h2 className="mt-1 font-display text-2xl text-ink">{item.question}</h2>
-        <p className="mt-2 text-sm text-mist">{reveal ? 'أُغلق العدّ. هذا توزيع القاعة.' : 'اثنتا عشرة ثانية. الكل يصوّت، بما فيها صاحبة الرأي.'}</p>
+        <p className="mt-2 text-sm text-mist">{reveal ? 'أُغلق العدّ. هذا توزيع القاعة.' : 'اثنتا عشرة ثانية. الكل يصوّت.'}</p>
       </div>
       <div className="vote-ring-wrap">
         <svg viewBox="0 0 220 220" className="vote-ring" aria-hidden="true">

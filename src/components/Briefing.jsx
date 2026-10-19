@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react'
 import roles from '../data/roles.json'
 import { BRANCHES, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
-import { HOST_NAME, LEVEL_STYLE } from '../config'
+import { HOST_NAME } from '../config'
 
 export const SLIDES = [
   { id: 'company', kicker: 'قبل الحالات', title: 'الشركة' },
@@ -309,10 +309,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </div>
       )}
 
-      <p className="brief-step">
-        {step + 1} / {SLIDES.length}
-        <span className={`chip ${LEVEL_STYLE.strategic.chip}`}>الأسئلة السريعة قبل الحالات</span>
-      </p>
+      <p className="brief-step">{step + 1} / {SLIDES.length}</p>
     </section>
   )
 }

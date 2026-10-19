@@ -329,7 +329,6 @@ export default function HostRoom({ identity, onLeave }) {
           </div>
           {topic === 'الكل' && (
             <div className="mb-4 grid gap-2">
-              <p className="text-sm font-extrabold text-gold2">الأسئلة السريعة، قبل الحالات</p>
               {QUIZZES.map((entry) => {
                 const current = quizzing && state.quizIndex === entry.id - 1
                 const done = (state.ledger || []).some((row) => row.kind === 'quiz' && row.quizId === entry.id)
@@ -341,7 +340,7 @@ export default function HostRoom({ identity, onLeave }) {
                   >
                     <span className="text-xs text-gold">سؤال {entry.id}</span>
                     <span className="mt-1 block font-semibold text-ink">{entry.question}</span>
-                    <span className="mt-1 block text-xs text-faint">{done ? 'تم التصويت' : 'قبل الحالات'}</span>
+                    {done && <span className="mt-1 block text-xs text-faint">تم التصويت</span>}
                   </button>
                 )
               })}
@@ -457,7 +456,7 @@ export default function HostRoom({ identity, onLeave }) {
               : pending.type === 'clear-votes'
                 ? 'ستُمسح أصوات الحالة الحالية ويُغلق باب التصويت من جديد.'
                 : pending.type === 'quiz-start'
-                  ? 'سيُحفظ تصويت الحالة الحالية، ثم تفتح الأسئلة السريعة التي قبل الحالات.'
+                  ? 'سيُحفظ تصويت الحالة الحالية، ثم تفتح الأسئلة السريعة.'
                   : 'سيُحفظ تصويت الحالة الحالية، ثم تُفتح الحالة الأخرى بحالتها المحفوظة إن وُجدت.'}
           </p>
           <div className="mt-5 flex gap-3">

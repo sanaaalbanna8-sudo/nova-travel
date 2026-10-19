@@ -794,9 +794,21 @@ input:focus-visible {
   background: #fff8ea;
 }
 
-.org-card.lv-strategic { border-color: #c9a227; background: #fffaf0; }
-.org-card.lv-management { border-color: #0e7c84; background: #f4fbfb; }
-.org-card.lv-operational { border-color: #e7b2ab; background: #fff; }
+.org-card.lv-strategic {
+  border-color: #a88412;
+  border-width: 2.5px;
+  background: #ffe08a;
+}
+.org-card.lv-management {
+  border-color: #0b6a71;
+  border-width: 2.5px;
+  background: #9edfe3;
+}
+.org-card.lv-operational {
+  border-color: #d44838;
+  border-width: 2.5px;
+  background: #ffc3bb;
+}
 
 .org-card small,
 .org-card strong,
@@ -819,7 +831,7 @@ input:focus-visible {
 
 .org-card b {
   margin-top: 1px;
-  color: #8a6420;
+  color: #3d4654;
   font-size: 0.52rem;
   font-weight: 800;
   letter-spacing: 0.01em;

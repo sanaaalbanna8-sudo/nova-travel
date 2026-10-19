@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import cases from '../data/cases.json'
 import roles from '../data/roles.json'
-import { LOCAL_HOST_PIN, STORAGE_LOCAL } from '../config'
+import { STORAGE_LOCAL } from '../config'
 import { apply, createState } from '../../shared/meeting.js'
 
 function socketUrl() {
@@ -37,12 +37,6 @@ export function useMeeting(identity) {
 
     const enterLocal = () => {
       if (stopped || everRef.current || modeRef.current === 'local') return
-      const current = identityRef.current
-      if (current.role === 'host' && current.pin !== LOCAL_HOST_PIN) {
-        modeRef.current = 'denied'
-        setStatus('denied')
-        return
-      }
       modeRef.current = 'local'
       setStatus('local')
       setOnlineIds([])

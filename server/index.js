@@ -12,7 +12,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 const isProd = process.argv.includes('--prod') || process.env.NODE_ENV === 'production'
 const PORT = Number(process.env.PORT || 5173)
-const HOST_PIN = process.env.HOST_PIN || 'NOVA-BTEC'
 const dataDir = path.join(__dirname, 'data')
 const stateFile = path.join(dataDir, 'state.json')
 
@@ -82,6 +81,7 @@ function viewFor(client) {
     voteEndsAt: meeting.voteEndsAt,
     advice: meeting.advice,
     briefing: meeting.briefing === undefined ? 0 : meeting.briefing,
+    discussStartedAt: typeof meeting.discussStartedAt === 'number' ? meeting.discussStartedAt : null,
     updatedAt: meeting.updatedAt,
   }
   if (client.isHost) {
@@ -164,11 +164,6 @@ wss.on('connection', (ws) => {
 
     if (message.type === 'join') {
       if (message.role === 'host') {
-        if (message.pin !== HOST_PIN) {
-          ws.send(JSON.stringify({ type: 'error', code: 'pin' }))
-          ws.close()
-          return
-        }
         ws.isHost = true
         ws.joined = true
       } else if (message.role === 'student') {
@@ -261,7 +256,6 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log('الاجتماع الطارئ — The Emergency Meeting')
   console.log('نوفا ترافل — Nova Travel')
   console.log(isProd ? 'وضع التشغيل للحصّة' : 'وضع التطوير للحصّة')
-  console.log(`رمز المضيف: ${HOST_PIN}`)
   urls.forEach((url) => {
     console.log(`المضيفة: ${url}/host`)
     console.log(`البنات: ${url}/join`)

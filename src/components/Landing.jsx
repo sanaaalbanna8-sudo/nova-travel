@@ -5,7 +5,6 @@ import { Mark } from './Shell'
 
 export default function Landing({ gate = 'student', error = '', onHost, onStudent }) {
   const [step] = useState(gate === 'host' || error ? 'host' : 'student')
-  const [pin, setPin] = useState('')
   const [picked, setPicked] = useState(null)
 
   const role = roles.find((item) => item.id === picked)
@@ -29,31 +28,14 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
       </div>
 
       {step === 'host' && (
-        <form
-          className="panel mx-auto mt-10 w-full max-w-md p-7"
-          onSubmit={(event) => {
-            event.preventDefault()
-            if (pin.trim()) onHost(pin.trim())
-          }}
-        >
+        <div className="panel mx-auto mt-10 w-full max-w-md p-7">
           <h2 className="font-display text-4xl text-ink">مقعد الرئاسة</h2>
-          <p className="mt-3 text-sm leading-7 text-mist">يُدخل المضيف رمز الجلسة للمتابعة إلى لوحة التحكم.</p>
-          <label className="mt-6 block text-sm text-gold2" htmlFor="pin">
-            رمز المضيف
-          </label>
-          <input
-            id="pin"
-            type="password"
-            value={pin}
-            autoComplete="current-password"
-            onChange={(event) => setPin(event.target.value)}
-            className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-ink"
-          />
+          <p className="mt-3 text-sm leading-7 text-mist">ادخلي لوحة التحكم مباشرة، من غير رمز.</p>
           {error && <p className="mt-3 text-sm text-coral">{error}</p>}
-          <button className="btn-gold mt-6 w-full" type="submit">
+          <button className="btn-gold mt-6 w-full" type="button" onClick={() => onHost()}>
             دخول اللوحة
           </button>
-        </form>
+        </div>
       )}
 
       {step === 'student' && !role && (

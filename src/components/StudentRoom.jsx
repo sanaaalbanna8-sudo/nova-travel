@@ -4,7 +4,7 @@ import roles from '../data/roles.json'
 import { BRAND_EN, LEVEL_STYLE, MEETING_AR, MEETING_EN, PHASE_LABEL } from '../config'
 import { summarize } from '../../shared/meeting.js'
 import { useMeeting } from '../hooks/useMeeting'
-import { Shell, useCountdown } from './Shell'
+import { Shell, useCountdown, useElapsed } from './Shell'
 import CaseCard from './CaseCard'
 import ResultsBoard from './ResultsBoard'
 import Briefing from './Briefing'
@@ -14,6 +14,8 @@ export default function StudentRoom({ identity, onLeave }) {
   const { state, status, send } = useMeeting(identity)
   const role = roles.find((item) => item.id === identity.studentId)
   const clock = useCountdown(state?.timerEndsAt)
+  const discussing = !!state && (typeof state.briefing === 'number' || state.phase === 'discuss')
+  const elapsed = useElapsed(discussing ? state.discussStartedAt : null)
   const secondsLeft = useVoteSeconds(state?.voteEndsAt, state?.phase === 'voting')
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function StudentRoom({ identity, onLeave }) {
   const votingOpen = state.phase === 'voting'
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage progress={(state.caseIndex + 1) / cases.length}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage clock={elapsed} progress={opening ? (state.briefing + 1) / 4 : (state.caseIndex + 1) / cases.length}>
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (

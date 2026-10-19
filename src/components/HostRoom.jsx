@@ -5,7 +5,7 @@ import { GLOSSARY } from '../data/glossary'
 import { HOST_NAME, MEETING_AR, MEETING_EN, PHASE_LABEL } from '../config'
 import { useMeeting } from '../hooks/useMeeting'
 import { seatHref } from '../paths'
-import { Modal, Shell, useCountdown } from './Shell'
+import { Modal, Shell, useCountdown, useElapsed } from './Shell'
 import { armVoteSound, playVoteOpen } from '../lib/voteSound'
 import CaseCard from './CaseCard'
 import Roster from './Roster'
@@ -48,6 +48,8 @@ export default function HostRoom({ identity, onLeave }) {
   }, [status, state?.phase, state?.voteEndsAt, send])
 
   const clock = useCountdown(state?.timerEndsAt)
+  const discussing = !!state && (typeof state.briefing === 'number' || state.phase === 'discuss')
+  const elapsed = useElapsed(discussing ? state.discussStartedAt : null)
   const item = state ? cases[state.caseIndex] : null
   const voteCount = Object.keys(state?.votes || {}).length
   const topics = useMemo(() => ['الكل', ...new Set(cases.flatMap((entry) => entry.topics))], [])
@@ -88,7 +90,7 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 4}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 4}>
       <div className={`board ${opening ? 'is-opening' : ''}`}>
         {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
         <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>

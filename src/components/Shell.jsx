@@ -1,6 +1,22 @@
 import { useEffect, useState } from 'react'
 import { BRAND_AR, BRAND_EN, MEETING_AR, MEETING_EN } from '../config'
 
+export function useElapsed(startedAt) {
+  const [now, setNow] = useState(Date.now())
+
+  useEffect(() => {
+    if (!startedAt) return undefined
+    const timer = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [startedAt])
+
+  if (!startedAt) return null
+  const total = Math.max(0, Math.floor((now - startedAt) / 1000))
+  const minutes = Math.floor(total / 60)
+  const seconds = total % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
 export function useCountdown(endsAt) {
   const [now, setNow] = useState(Date.now())
 
@@ -57,13 +73,12 @@ export function Modal({ title, onClose, children, wide = false }) {
   )
 }
 
-export function Shell({ status, onLeave, leaveLabel = 'مغادرة القاعة', stage = false, progress = 0, children }) {
+export function Shell({ status, onLeave, leaveLabel = 'مغادرة القاعة', stage = false, progress = 0, clock = null, children }) {
   const statusMap = {
     live: { text: 'Live', className: 'bg-[#e7f6f7] text-sea' },
-    local: { text: 'تجريبي', className: 'bg-[#fff4d8] text-gold2' },
     connecting: { text: 'جارٍ الربط', className: 'bg-panel2 text-mist' },
   }
-  const pill = statusMap[status] || statusMap.connecting
+  const pill = statusMap[status] || null
 
   const header = (
     <header className={stage ? 'stage-top' : 'sticky top-0 z-30 border-b border-white/70 bg-[#e7eef8]/80 backdrop-blur'}>
@@ -84,7 +99,7 @@ export function Shell({ status, onLeave, leaveLabel = 'مغادرة القاعة
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${pill.className}`}>{pill.text}</span>
+          {pill && <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${pill.className}`}>{pill.text}</span>}
           <button className="btn-ghost min-h-10 px-3 py-2 text-xs" onClick={onLeave}>
             {leaveLabel}
           </button>
@@ -95,11 +110,17 @@ export function Shell({ status, onLeave, leaveLabel = 'مغادرة القاعة
 
   if (stage) {
     return (
-      <div className="stage-app">
+      <div className={`stage-app ${clock ? 'has-clock' : ''}`}>
         {header}
         <div className="stage-rail" aria-hidden="true">
           <i style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} />
         </div>
+        {clock && (
+          <aside className="stage-clock" aria-live="polite">
+            <span>وقت النقاش</span>
+            <strong>{clock}</strong>
+          </aside>
+        )}
         <main className="stage-body">{children}</main>
       </div>
     )

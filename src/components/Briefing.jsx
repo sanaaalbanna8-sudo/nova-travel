@@ -1,5 +1,5 @@
 import roles from '../data/roles.json'
-import { LEVEL_STYLE } from '../config'
+import { HOST_NAME, LEVEL_STYLE } from '../config'
 
 const SLIDES = [
   { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
@@ -18,6 +18,16 @@ const FLOW = [
   ['كندة بطاح', 'تعرض'],
   ['غزل أبو الرب', 'تقرر'],
 ]
+
+function SeatBox({ role, level }) {
+  return (
+    <article className={`org-card lv-${level || role.level}`}>
+      <strong>{role.nameAr}</strong>
+      <b>{role.name}</b>
+      <span>{role.title}</span>
+    </article>
+  )
+}
 
 export default function Briefing({ step = 0, onStep }) {
   const slide = SLIDES[step] || SLIDES[0]
@@ -42,26 +52,28 @@ export default function Briefing({ step = 0, onStep }) {
 
       {step === 0 && (
         <div className="brief-org">
-          <div className="org-tree">
-            <article className="pyr-card is-host">
-              <small>الإدارة العليا</small>
-              <strong>Sanaa Albanna</strong>
-              <span>المدير التنفيذي العام</span>
-            </article>
-            <div className="org-bands">
-              {bands.map(([level, label]) => (
-                <section key={level} className={`pyr-band lv-${level}`}>
-                  <p>{label}</p>
+          <div className="org-chart">
+            <div className="org-tier">
+              <article className="org-card is-host">
+                <small>الإدارة العليا</small>
+                <strong>{HOST_NAME}</strong>
+                <b>Sanaa Albanna</b>
+                <span>المدير التنفيذي العام</span>
+              </article>
+            </div>
+            {bands.map(([level, label]) => (
+              <div key={level} className={`org-tier lv-${level}`}>
+                <p className="org-level">{label}</p>
+                <div className="org-line">
                   {roles
                     .filter((role) => role.level === level)
                     .map((role) => (
-                      <span key={role.id}>{role.title}</span>
+                      <SeatBox key={role.id} role={role} level={level} />
                     ))}
-                </section>
-              ))}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <p>الشركة تقف على هذه الوظائف. كل وظيفة عليها بنت، والمقعد 3 لكندة: مهندسة الواجهات الأمامية ولوحات معلومات المسافرين.</p>
           <ol className="life-flow">
             {FLOW.map(([name, verb]) => (
               <li key={name}>
@@ -75,21 +87,24 @@ export default function Briefing({ step = 0, onStep }) {
 
       {step === 1 && (
         <div className="pyramid">
-          <article className="pyr-card is-host">
-            <small>الإدارة العليا</small>
-            <strong>Sanaa Albanna</strong>
-            <span>المدير التنفيذي العام</span>
-          </article>
-          {bands.map(([level, label]) => (
-            <div key={level} className={`pyr-band lv-${level}`}>
+          <div className="pyr-row is-apex">
+            <article className="pyr-card is-host">
+              <small>الإدارة العليا</small>
+              <strong>{HOST_NAME}</strong>
+              <b>Sanaa Albanna</b>
+              <span>المدير التنفيذي العام</span>
+            </article>
+          </div>
+          {bands.map(([level, label], index) => (
+            <div key={level} className={`pyr-row is-${index + 2} lv-${level}`}>
               <p>{label}</p>
               <div>
                 {roles
                   .filter((role) => role.level === level)
                   .map((role) => (
                     <article key={role.id} className="pyr-card">
-                      <small>{role.id}</small>
-                      <strong>{role.name}</strong>
+                      <strong>{role.nameAr}</strong>
+                      <b>{role.name}</b>
                       <span>{role.title}</span>
                     </article>
                   ))}

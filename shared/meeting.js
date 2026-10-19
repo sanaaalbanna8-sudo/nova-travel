@@ -19,6 +19,7 @@ export function createState() {
     history: {},
     briefing: 0,
     ledger: [],
+    discussStartedAt: Date.now(),
     updatedAt: Date.now(),
   }
 }
@@ -49,15 +50,17 @@ function moveTo(state, index, caseCount) {
     [state.caseIndex]: snapshot(state),
   }
   const saved = history[index]
+  const phase = saved?.phase || PHASE.discuss
   return touch({
     ...state,
     history,
     caseIndex: index,
-    phase: saved?.phase || PHASE.discuss,
+    phase,
     votes: saved?.votes ? { ...saved.votes } : {},
     advice: saved?.advice || null,
     timerEndsAt: null,
     voteEndsAt: saved?.voteEndsAt || null,
+    discussStartedAt: phase === PHASE.discuss ? Date.now() : state.discussStartedAt || null,
   })
 }
 
@@ -126,6 +129,7 @@ export function apply(state, action, caseCount) {
           [state.caseIndex]: { phase: PHASE.discuss, votes: {}, advice: null, voteEndsAt: null },
         },
         voteEndsAt: null,
+        discussStartedAt: Date.now(),
         ledger: (state.ledger || []).filter((item) => !(item.kind === 'vote' && item.caseId === state.caseIndex + 1)),
       })
     case 'timer': {
@@ -149,9 +153,16 @@ export function apply(state, action, caseCount) {
           advice: null,
           voteEndsAt: null,
           timerEndsAt: null,
+          discussStartedAt: Date.now(),
         })
       }
-      return touch({ ...state, briefing: step, phase: PHASE.discuss, voteEndsAt: null })
+      return touch({
+        ...state,
+        briefing: step,
+        phase: PHASE.discuss,
+        voteEndsAt: null,
+        discussStartedAt: Date.now(),
+      })
     }
     case 'reset':
       return createState()

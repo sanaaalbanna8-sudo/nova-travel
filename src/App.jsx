@@ -8,7 +8,7 @@ import StudentRoom from './components/StudentRoom'
 function readIdentity() {
   try {
     const saved = JSON.parse(sessionStorage.getItem(STORAGE_IDENTITY) || 'null')
-    if (saved?.role === 'host' && saved.pin) return saved
+    if (saved?.role === 'host') return { role: 'host' }
     if (saved?.role === 'student' && saved.studentId) return saved
   } catch {
     /* تُفتح صفحة الدخول */
@@ -27,8 +27,8 @@ export default function App() {
     setError(message)
   }, [])
 
-  const enterHost = (pin) => {
-    const next = { role: 'host', pin }
+  const enterHost = () => {
+    const next = { role: 'host' }
     sessionStorage.setItem(STORAGE_IDENTITY, JSON.stringify(next))
     setError('')
     setIdentity(next)

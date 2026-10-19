@@ -8,7 +8,7 @@ export const CHOICES = ['A', 'B', 'C']
 export const VOTE_SECONDS = 12
 export const QUIZ_VOTE_SECONDS = 15
 export const BRIEF_MAX = 6
-export const QUIZ_MAX = 9
+export const QUIZ_MAX = 8
 
 export function createState() {
   return {

@@ -103,11 +103,11 @@ function assertMeetingFlow() {
   quiz = apply(quiz, { type: 'quiz-end' }, 20)
   if (quiz.quizIndex !== null || quiz.votes['2']) throw new Error('إنهاء الأسئلة لم يرجّع الحالات فارغة')
   if (!quiz.quizHistory[0] || quiz.quizHistory[0].votes['2'] !== 'C') throw new Error('سجل السؤال السريع ضاع')
-  quiz = apply(quiz, { type: 'quiz-start', quizIndex: 9 }, 20)
-  if (quiz.quizIndex !== 9 || quiz.caseIndex !== 0) throw new Error('السؤال الأخير ما صار قبل الحالة الأولى')
+  quiz = apply(quiz, { type: 'quiz-start', quizIndex: 8 }, 20)
+  if (quiz.quizIndex !== 8 || quiz.caseIndex !== 0) throw new Error('السؤال الأخير ما صار قبل الحالة الأولى')
   quiz = apply(quiz, { type: 'quiz-end' }, 20)
-  quiz = apply(quiz, { type: 'quiz-start', quizIndex: 9 }, 20)
-  if (quiz.quizIndex !== 9) throw new Error('الرجوع من الحالة الأولى ما فتح آخر سؤال')
+  quiz = apply(quiz, { type: 'quiz-start', quizIndex: 8 }, 20)
+  if (quiz.quizIndex !== 8) throw new Error('الرجوع من الحالة الأولى ما فتح آخر سؤال')
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)

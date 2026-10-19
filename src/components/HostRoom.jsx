@@ -403,7 +403,7 @@ export default function HostRoom({ identity, onLeave }) {
 
       {modal === 'links' && (
         <Modal title="رابطا الدخول" onClose={() => setModal(null)}>
-          <p className="mb-4 text-sm leading-7 text-mist">رابط المضيفة يبقى على لابتوب الرئاسة. رابط البنات يُرسل إلى الأجهزة، ويُؤخذ من عنوان الشبكة لا من localhost.</p>
+          <p className="mb-4 text-sm leading-7 text-mist">رابط المضيفة يبقى على لابتوب الرئاسة. رابط البنات هو الذي تحت، وتفتحه الأجهزة.</p>
           <p className="mb-2 text-sm font-semibold text-gold2">المضيفة</p>
           <div className="mb-4 space-y-2">
             {hostLinks.map((url) => (

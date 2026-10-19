@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import cases from '../data/cases.json'
 import roles from '../data/roles.json'
 import { STORAGE_LOCAL } from '../config'
+import { openCloud } from '../lib/cloudRoom'
 import { apply, createState } from '../../shared/meeting.js'
 
 function socketUrl() {
@@ -25,6 +26,7 @@ export function useMeeting(identity) {
   const [onlineIds, setOnlineIds] = useState([])
   const [status, setStatus] = useState('connecting')
   const wsRef = useRef(null)
+  const cloudRef = useRef(null)
   const modeRef = useRef('connecting')
   const everRef = useRef(false)
   const identityRef = useRef(identity)
@@ -57,6 +59,39 @@ export function useMeeting(identity) {
     }
     channel.addEventListener('message', onChannel)
     window.addEventListener('storage', onStorage)
+
+    let clouding = false
+    const enterCloud = () => {
+      if (stopped || clouding || everRef.current || modeRef.current === 'local') return
+      clouding = true
+      openCloud(identityRef.current, cases.length).then((session) => {
+        if (stopped) {
+          session?.close()
+          return
+        }
+        if (!session) {
+          enterLocal()
+          return
+        }
+        everRef.current = true
+        modeRef.current = 'cloud'
+        cloudRef.current = session
+        session.onState = (next) => {
+          if (!stopped) setState(next)
+        }
+        session.onPresence = (ids) => {
+          if (!stopped) setOnlineIds(ids)
+        }
+        session.onReplaced = () => {
+          stopped = true
+          modeRef.current = 'replaced'
+          setStatus('replaced')
+          session.close()
+        }
+        setStatus('live')
+        if (identityRef.current.role === 'host') session.send({ type: 'arrive' })
+      })
+    }
 
     const connect = () => {
       if (stopped || modeRef.current === 'local' || modeRef.current === 'denied') return
@@ -110,7 +145,7 @@ export function useMeeting(identity) {
       ws.onclose = () => {
         if (stopped) return
         if (!everRef.current) {
-          enterLocal()
+          enterCloud()
           return
         }
         setStatus('connecting')
@@ -127,8 +162,17 @@ export function useMeeting(identity) {
       channel.close()
       window.removeEventListener('storage', onStorage)
       wsRef.current?.close()
+      cloudRef.current?.close()
     }
   }, [identity.role, identity.pin, identity.studentId])
+
+  useEffect(() => {
+    if (identity.role !== 'host' || status !== 'live' || modeRef.current !== 'cloud') return undefined
+    if (state?.phase !== 'voting' || !state.voteEndsAt) return undefined
+    const wait = Math.max(0, state.voteEndsAt - Date.now() + 120)
+    const id = setTimeout(() => send({ type: 'close' }), wait)
+    return () => clearTimeout(id)
+  }, [identity.role, status, state?.phase, state?.voteEndsAt])
 
   const send = (action) => {
     if (modeRef.current === 'live' && wsRef.current?.readyState === WebSocket.OPEN) {
@@ -151,6 +195,14 @@ export function useMeeting(identity) {
           }),
         )
       }
+      return
+    }
+    if (modeRef.current === 'cloud' && cloudRef.current) {
+      const actionToSend =
+        action.type === 'vote' || action.type === 'arrive'
+          ? { ...action, studentId: identityRef.current.studentId }
+          : action
+      cloudRef.current.send(actionToSend)
       return
     }
     if (modeRef.current !== 'local') return

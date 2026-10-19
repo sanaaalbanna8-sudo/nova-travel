@@ -45,6 +45,7 @@ function normalize(raw) {
   if (!['A', 'B', 'C'].includes(next.advice)) next.advice = null
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
+  if (next.briefing !== null && next.briefing !== 0 && next.briefing !== 1 && next.briefing !== 2) next.briefing = 0
   return next
 }
 
@@ -79,6 +80,7 @@ function viewFor(client) {
     timerEndsAt: meeting.timerEndsAt,
     voteEndsAt: meeting.voteEndsAt,
     advice: meeting.advice,
+    briefing: meeting.briefing === undefined ? 0 : meeting.briefing,
     updatedAt: meeting.updatedAt,
   }
   if (client.isHost) {
@@ -198,6 +200,7 @@ wss.on('connection', (ws) => {
         caseIndex: Number(message.caseIndex),
         minutes: Number(message.minutes),
         choice: message.choice,
+        step: message.step === undefined ? undefined : message.step,
       }
       if (action.type === 'advise' && cases[meeting.caseIndex]?.addressedTo !== 'host') return
       commit(apply(meeting, action, cases.length))

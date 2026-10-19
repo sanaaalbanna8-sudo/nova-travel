@@ -7,6 +7,7 @@ import { useMeeting } from '../hooks/useMeeting'
 import { Shell, useCountdown } from './Shell'
 import CaseCard from './CaseCard'
 import ResultsBoard from './ResultsBoard'
+import Briefing from './Briefing'
 import { useVoteSeconds } from './VoteStage'
 
 export default function StudentRoom({ identity, onLeave }) {
@@ -54,6 +55,10 @@ export default function StudentRoom({ identity, onLeave }) {
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage progress={(state.caseIndex + 1) / cases.length}>
       <div className="board board-student">
         <div className="board-main">
+          {state.briefing !== null && state.briefing !== undefined ? (
+            <Briefing step={state.briefing} />
+          ) : (
+            <>
           <CaseCard item={item} mode="story" />
           {summary ? (
             <ResultsBoard item={item} summary={summary} myVote={myVote} compact />
@@ -66,16 +71,20 @@ export default function StudentRoom({ identity, onLeave }) {
               onVote={votingOpen ? (choice) => send({ type: 'vote', choice }) : null}
             />
           )}
+            </>
+          )}
           <div className="board-dock">
             <span className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</span>
-            <strong className="text-sm text-ink">{role.title}</strong>
-            <span className="text-xs font-bold text-faint">الرقم {role.id}</span>
+            <strong className="text-sm text-ink">{role.name}</strong>
+            <span className="text-xs font-bold text-faint">{role.title}</span>
             <span className="me-auto text-xs font-bold text-mist">
-              {state.phase === 'discuss'
-                ? Number(item.addressedTo) === role.id
-                  ? 'رأيك الآن شفهي، والتصويت مع الكل'
-                  : `نسمع رأي ${item.addressedLabel} شفهياً`
-                : PHASE_LABEL[state.phase]}
+              {state.briefing !== null && state.briefing !== undefined
+                ? 'قبل الحالات: الهيكل ثم الهرم ثم السؤال'
+                : state.phase === 'discuss'
+                  ? Number(item.addressedTo) === role.id
+                    ? 'رأيك الآن شفهي، والتصويت مع الكل'
+                    : `نسمع رأي ${item.addressedLabel} شفهياً`
+                  : PHASE_LABEL[state.phase]}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''}
             </span>
             {secondsLeft !== null && (

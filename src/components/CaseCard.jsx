@@ -18,13 +18,14 @@ export default function CaseCard({ item, mode = 'full', myVote = null, votingOpe
             <span className="text-xs font-bold text-faint">{item.minutes} د نقاش</span>
           </div>
           <div className="case-speak">
-            <RoleMark who={item.addressedTo} name={item.addressedLabel} host={hostCase} />
+            <RoleMark who={item.roleKey || item.addressedTo} name={item.addressedLabel} host={hostCase} />
             <div>
               <h2>{item.title}</h2>
+              <p className="case-job">{item.addressedTitle}</p>
               <p className="case-who">
                 {hostCase
                   ? 'بتحكي رأيك بالقاعة، وبعدين بتفتحي التصويت وإحنا كلنا بنصوّت.'
-                  : 'بتحكي رأيها بالقاعة، وبعدين لما ينفتح التصويت بتصوّت معنا كلنا.'}
+                  : `${item.addressedLabel} بتحكي رأيها بالقاعة، وبعدين لما ينفتح التصويت بتصوّت معنا كلنا.`}
               </p>
             </div>
           </div>

@@ -17,6 +17,7 @@ export function createState() {
     timerEndsAt: null,
     voteEndsAt: null,
     history: {},
+    briefing: 0,
     updatedAt: Date.now(),
   }
 }
@@ -63,6 +64,7 @@ export function apply(state, action, caseCount) {
   switch (action.type) {
     case 'open':
       if (state.phase === PHASE.voting) return state
+      if (typeof state.briefing === 'number') return state
       return touch({
         ...state,
         phase: PHASE.voting,
@@ -112,6 +114,25 @@ export function apply(state, action, caseCount) {
       const timerEndsAt =
         Number.isFinite(minutes) && minutes > 0 ? Date.now() + minutes * 60 * 1000 : null
       return touch({ ...state, timerEndsAt })
+    }
+    case 'brief': {
+      const step = action.step
+      if (step !== null && step !== 0 && step !== 1 && step !== 2) return state
+      if (state.briefing === step) return state
+      if (step === null) {
+        return touch({
+          ...state,
+          briefing: null,
+          caseIndex: 0,
+          phase: PHASE.discuss,
+          votes: {},
+          summary: null,
+          advice: null,
+          voteEndsAt: null,
+          timerEndsAt: null,
+        })
+      }
+      return touch({ ...state, briefing: step, phase: PHASE.discuss, voteEndsAt: null })
     }
     case 'reset':
       return createState()

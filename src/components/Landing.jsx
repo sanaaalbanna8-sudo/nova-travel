@@ -3,12 +3,6 @@ import roles from '../data/roles.json'
 import { BRAND_AR, BRAND_EN, LEVEL_STYLE, MEETING_AR, MEETING_EN } from '../config'
 import { Mark } from './Shell'
 
-const GROUPS = [
-  ['strategic', 'المستوى الاستراتيجي', 'الأرقام 1 – 3'],
-  ['management', 'المستوى الإداري', 'الأرقام 4 – 8'],
-  ['operational', 'المستوى التشغيلي', 'الأرقام 9 – 17'],
-]
-
 export default function Landing({ gate = 'student', error = '', onHost, onStudent }) {
   const [step] = useState(gate === 'host' || error ? 'host' : 'student')
   const [pin, setPin] = useState('')
@@ -68,28 +62,22 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
             <h2 className="font-display text-4xl text-ink">الرقم الوظيفي</h2>
             <p className="mt-2 text-sm text-mist">يُختار الرقم الذي وُزّع في بداية الاجتماع.</p>
           </div>
-          <div className="grid gap-5">
-            {GROUPS.map(([level, label, range]) => (
-              <section key={level} className="panel p-4 sm:p-5">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <span className={`chip ${LEVEL_STYLE[level].chip}`}>{label}</span>
-                  <span className="text-xs text-faint">{range}</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-                  {roles
-                    .filter((item) => item.level === level)
-                    .map((item) => (
-                      <button
-                        key={item.id}
-                        className="rounded-2xl border border-line bg-white py-4 text-xl font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-gold"
-                        onClick={() => setPicked(item.id)}
-                      >
-                        {item.id}
-                      </button>
-                    ))}
-                </div>
-              </section>
-            ))}
+          <div className="panel p-4 sm:p-5">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <span className="text-sm font-extrabold text-ink">اختاري الرقم الذي أخذتِه</span>
+              <span className="text-xs text-faint">1 – 17</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+              {roles.map((item) => (
+                <button
+                  key={item.id}
+                  className="rounded-2xl border border-line bg-white py-4 text-xl font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-gold"
+                  onClick={() => setPicked(item.id)}
+                >
+                  {item.id}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -98,7 +86,8 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
         <div className="panel mx-auto mt-8 max-w-2xl p-6 sm:p-8">
           <p className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</p>
           <p className="mt-4 text-sm text-faint">الرقم {role.id}</p>
-          <h2 className="mt-2 font-display text-4xl leading-snug text-ink">{role.title}</h2>
+          <h2 className="mt-2 font-display text-4xl leading-snug text-ink">{role.name}</h2>
+          <p className="mt-2 text-lg font-extrabold text-ink">{role.title}</p>
           <p className="mt-4 leading-8 text-mist">{role.mandate}</p>
           <ul className="mt-4 space-y-2 text-sm leading-7 text-mist">
             {role.duties.map((duty) => (

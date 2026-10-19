@@ -150,6 +150,7 @@ export function useMeeting(identity) {
             caseIndex: action.caseIndex,
             minutes: action.minutes,
             choice: action.choice,
+            step: action.step,
           }),
         )
       }

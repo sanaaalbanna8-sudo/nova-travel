@@ -10,6 +10,7 @@ import { armVoteSound, playVoteOpen } from '../lib/voteSound'
 import CaseCard from './CaseCard'
 import Roster from './Roster'
 import VoteStage from './VoteStage'
+import Briefing from './Briefing'
 
 export default function HostRoom({ identity, onLeave }) {
   const meeting = useMeeting(identity)
@@ -85,43 +86,69 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={(state.caseIndex + 1) / cases.length}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / 3}>
       <div className="board">
-        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
+        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={state.briefing === null ? item.addressedTo : null} />}
         <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
-          <CaseCard item={item} mode="story" />
-          {state.phase === 'discuss' ? (
-            <CaseCard item={item} mode="choices" />
+          {state.briefing !== null && state.briefing !== undefined ? (
+            <Briefing step={state.briefing} />
           ) : (
-            <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+            <>
+              <CaseCard item={item} mode="story" />
+              {state.phase === 'discuss' ? (
+                <CaseCard item={item} mode="choices" />
+              ) : (
+                <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+              )}
+            </>
           )}
           <div className="board-dock">
-            <button
-              className="btn-gold"
-              disabled={state.phase === 'voting'}
-              onClick={() => {
-                armVoteSound()
-                playVoteOpen()
-                send({ type: 'open' })
-              }}
-            >
-              فتح التصويت · 12 ث
-            </button>
-            <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
-              إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
-            </button>
-            <button className="btn-ghost" disabled={state.caseIndex === 0} onClick={() => askMove({ type: 'prev' })}>
-              السابقة
-            </button>
-            <button className="btn-ghost" disabled={state.caseIndex === cases.length - 1} onClick={() => askMove({ type: 'next' })}>
-              التالية
-            </button>
-            <button className="btn-ghost" onClick={() => setModal('cases')}>
-              الحالات
-            </button>
+            {state.briefing !== null && state.briefing !== undefined ? (
+              <>
+                <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
+                  الشريحة السابقة
+                </button>
+                {state.briefing < 2 ? (
+                  <button className="btn-gold" onClick={() => send({ type: 'brief', step: state.briefing + 1 })}>
+                    الشريحة التالية
+                  </button>
+                ) : (
+                  <button className="btn-gold" onClick={() => send({ type: 'brief', step: null })}>
+                    ابدئي الحالات
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  className="btn-gold"
+                  disabled={state.phase === 'voting'}
+                  onClick={() => {
+                    armVoteSound()
+                    playVoteOpen()
+                    send({ type: 'open' })
+                  }}
+                >
+                  فتح التصويت · 12 ث
+                </button>
+                <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
+                  إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
+                </button>
+                <button className="btn-ghost" disabled={state.caseIndex === 0} onClick={() => askMove({ type: 'prev' })}>
+                  السابقة
+                </button>
+                <button className="btn-ghost" disabled={state.caseIndex === cases.length - 1} onClick={() => askMove({ type: 'next' })}>
+                  التالية
+                </button>
+                <button className="btn-ghost" onClick={() => setModal('cases')}>
+                  الحالات
+                </button>
+              </>
+            )}
             <span className="me-auto text-xs font-bold text-mist">
-              {String(item.id).padStart(2, '0')} / {cases.length} · {PHASE_LABEL[state.phase]}
-              {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · {voteCount}/17
+              {state.briefing !== null && state.briefing !== undefined
+                ? `التعريف ${state.briefing + 1} / 3`
+                : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
             </span>
             {!present && (
               <button className="btn-ghost" onClick={() => setTools((value) => !value)}>
@@ -164,6 +191,9 @@ export default function HostRoom({ identity, onLeave }) {
             </div>
             <button className="btn-ghost w-full" onClick={() => send({ type: 'timer', minutes: 0 })}>
               إيقاف المؤقت
+            </button>
+            <button className="btn-ghost w-full" onClick={() => send({ type: 'brief', step: 0 })}>
+              شرائح التعريف
             </button>
             <button className="btn-ghost w-full" onClick={() => setModal('roles')}>
               دليل الأدوار

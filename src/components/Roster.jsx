@@ -11,7 +11,10 @@ export default function Roster({ roles, onlineIds, votes, spotlight = null }) {
           return (
             <li key={role.id} className={`lv-${role.level} ${connected ? 'is-on' : ''} ${voted ? 'is-voted' : ''} ${speaking ? 'is-speak' : ''}`}>
               <b>{role.id}</b>
-              <span>{role.title}</span>
+              <span>
+                <strong>{role.name}</strong>
+                <em>{role.title}</em>
+              </span>
               <i />
             </li>
           )

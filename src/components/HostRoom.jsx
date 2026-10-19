@@ -11,7 +11,6 @@ import CaseCard from './CaseCard'
 import Roster from './Roster'
 import VoteStage from './VoteStage'
 import Briefing from './Briefing'
-import Insights from './Insights'
 
 export default function HostRoom({ identity, onLeave }) {
   const meeting = useMeeting(identity)
@@ -161,9 +160,6 @@ export default function HostRoom({ identity, onLeave }) {
             <button className="btn-ghost" onClick={() => setPresent((value) => !value)}>
               {present ? 'إظهار الأسماء' : 'وضع العرض'}
             </button>
-            <button className="btn-sea" onClick={() => setModal('stats')}>
-              لوحة الجلسة
-            </button>
           </div>
         </div>
       </div>
@@ -224,12 +220,6 @@ export default function HostRoom({ identity, onLeave }) {
             <p className="text-xs leading-6 text-faint">المتصلون {onlineIds.length} · المضيفة {HOST_NAME}</p>
           </div>
         </aside>
-      )}
-
-      {modal === 'stats' && (
-        <Modal title="لوحة الجلسة" wide onClose={() => setModal(null)}>
-          <Insights ledger={state.ledger || []} live={status === 'live'} />
-        </Modal>
       )}
 
       {modal === 'cases' && (

@@ -11,6 +11,8 @@ import ResultsBoard from './ResultsBoard'
 import Briefing from './Briefing'
 import QuizCard from './QuizCard'
 import { QUIZZES } from '../data/quizzes'
+import { ANSWER_KEY } from '../data/answerKey'
+import { QUIZ_KEY } from '../data/quizKey'
 import { useVoteSeconds } from './VoteStage'
 
 export default function StudentRoom({ identity, onLeave }) {
@@ -68,17 +70,12 @@ export default function StudentRoom({ identity, onLeave }) {
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
-            <Briefing
-              step={state.briefing}
-              seat={role}
-              onStep={(step) => send({ type: 'brief', step })}
-              onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
-            />
+            <Briefing step={state.briefing} curtain={state.curtain} watch onStep={(step) => send({ type: 'brief', step })} />
           ) : quizzing ? (
             <>
               <QuizCard item={quiz} total={QUIZZES.length} mode="story" />
               {summary ? (
-                <ResultsBoard item={quiz} summary={summary} myVote={myVote} compact />
+                <ResultsBoard item={quiz} summary={summary} myVote={myVote} answer={QUIZ_KEY[quiz.id]} compact />
               ) : (
                 <QuizCard
                   item={quiz}
@@ -94,7 +91,7 @@ export default function StudentRoom({ identity, onLeave }) {
             <>
           <CaseCard item={item} mode="story" />
           {summary ? (
-            <ResultsBoard item={item} summary={summary} myVote={myVote} compact />
+            <ResultsBoard item={item} summary={summary} myVote={myVote} answer={ANSWER_KEY[item.id]} compact />
           ) : (
             <CaseCard
               item={item}

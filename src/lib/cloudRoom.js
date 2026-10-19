@@ -9,7 +9,7 @@ const CONFIG = {
 }
 
 const ROOT = 'novaTravel'
-const STUDENT_ACTIONS = new Set(['vote', 'advise', 'curtain', 'arrive'])
+const STUDENT_ACTIONS = new Set(['vote', 'advise', 'arrive'])
 
 function database() {
   const firebase = window.firebase
@@ -49,6 +49,10 @@ function normalize(raw) {
     voteEndsAt: typeof raw.voteEndsAt === 'number' ? raw.voteEndsAt : null,
     quizIndex,
     briefing,
+    curtain: {
+      studentId: Number.isInteger(Number(raw.curtain?.studentId)) ? Number(raw.curtain.studentId) : 0,
+      guess: raw.curtain?.guess ? String(raw.curtain.guess) : '',
+    },
   }
 }
 
@@ -65,6 +69,7 @@ function project(full, identity) {
     advice: full.advice,
     briefing: full.briefing,
     quizIndex: full.quizIndex,
+    curtain: full.curtain || { studentId: 0, guess: '' },
     discussStartedAt: full.discussStartedAt,
     updatedAt: full.updatedAt,
     myVote: full.votes?.[key] || null,

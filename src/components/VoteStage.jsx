@@ -41,7 +41,7 @@ export function useVoteSeconds(endsAt, active) {
   return Math.max(0, Math.ceil((endsAt - now) / 1000))
 }
 
-export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) {
+export default function VoteStage({ item, phase, endsAt, votes, seconds = 12, answer = null }) {
   const live = phase === 'voting'
   const reveal = phase === 'results'
   const now = useNow(live)
@@ -52,6 +52,7 @@ export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) 
   const counts = useMemo(() => tally(votes || {}), [votes])
   const levels = useMemo(() => summarize(votes || {}, roles).levels, [votes])
   const top = Math.max(counts.counts.A, counts.counts.B, counts.counts.C)
+  const bestTitle = answer?.best ? item.options.find((option) => option.key === answer.best)?.title : ''
   const radius = 92
   const circumference = 2 * Math.PI * radius
   const seen = useRef(-1)
@@ -104,6 +105,13 @@ export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) 
         <p className="text-xs tracking-[0.18em] text-gold2">{reveal ? 'النتائج' : 'باب التصويت'}</p>
         <h2 className="mt-1 font-display text-2xl text-ink">{item.question}</h2>
         <p className="mt-2 text-sm text-mist">{reveal ? 'أُغلق العدّ. هذا توزيع القاعة.' : `${seconds} ثانية. الكل يصوّت.`}</p>
+        {reveal && answer?.best && (
+          <p className="vote-answer">
+            الأصح: {answer.best}
+            {bestTitle ? `. ${bestTitle}` : ''}
+            {answer.why ? ` — ${answer.why}` : ''}
+          </p>
+        )}
       </div>
       <div className="vote-ring-wrap">
         <svg viewBox="0 0 220 220" className="vote-ring" aria-hidden="true">
@@ -132,6 +140,7 @@ export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) 
             total={counts.total}
             reveal={reveal}
             winner={reveal && counts.total > 0 && counts.counts[option.key] === top}
+            answer={reveal && answer?.best === option.key}
             delay={index}
           />
         ))}
@@ -157,11 +166,11 @@ export default function VoteStage({ item, phase, endsAt, votes, seconds = 12 }) 
   )
 }
 
-function Column({ option, count, percent, total, reveal, winner, delay }) {
+function Column({ option, count, percent, total, reveal, winner, answer, delay }) {
   const shown = useCountUp(reveal ? percent : percent, reveal)
   const width = reveal ? shown : total ? percent : 0
   return (
-    <article className={`vote-col ${winner ? 'is-winner' : ''}`} style={{ '--d': `${delay * 80}ms`, '--bar': CHOICE_STYLE[option.key].bar }}>
+    <article className={`vote-col ${winner ? 'is-winner' : ''} ${answer ? 'is-answer' : ''}`} style={{ '--d': `${delay * 80}ms`, '--bar': CHOICE_STYLE[option.key].bar }}>
       <div className="vote-col-top">
         <span>{option.key}</span>
         <b>{reveal ? shown : count}</b>
@@ -171,6 +180,7 @@ function Column({ option, count, percent, total, reveal, winner, delay }) {
         <i style={{ height: `${width}%` }} />
       </div>
         <p>{option.title}</p>
+        {answer && <em>الأصح</em>}
         <small className={option.role ? 'is-role' : ''}>{option.role ? `${option.role}. ${option.text}` : option.text}</small>
     </article>
   )

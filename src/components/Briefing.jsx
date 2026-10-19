@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import roles from '../data/roles.json'
 import { BRANCHES, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME } from '../config'
@@ -41,10 +41,10 @@ function taskOf(id) {
   return WORKFLOW.find((item) => item.id === id)?.verb || ''
 }
 
-function CurtainGame({ seat, onCurtain }) {
-  const [who, setWho] = useState(seat?.id || null)
-  const [guess, setGuess] = useState(null)
-  const [open, setOpen] = useState(false)
+function CurtainGame({ curtain, watch = false, onChoose, onPick }) {
+  const who = Number(curtain?.studentId) || null
+  const guess = curtain?.guess || null
+  const open = Boolean(guess)
   const player = who ? roleById(who) : null
   const answer = player ? managerKey(player.id) : null
   const options = [
@@ -56,21 +56,18 @@ function CurtainGame({ seat, onCurtain }) {
   const right = open && guess === answer
 
   const chooseGirl = (id) => {
-    setWho(id)
-    setGuess(null)
-    setOpen(false)
+    if (watch) return
+    onChoose?.(id)
   }
 
   const pick = (key) => {
-    if (!player || open) return
-    setGuess(key)
-    setOpen(true)
-    onCurtain?.(player.id, key)
+    if (watch || !player || open) return
+    onPick?.(player.id, key)
   }
 
   return (
-    <div className="guess-game">
-      {!seat && (
+    <div className={`guess-game ${watch ? 'is-watch' : ''}`}>
+      {!watch && (
         <div className="guess-cast">
           {roles.map((role) => (
             <button key={role.id} type="button" className={who === role.id ? 'is-on' : ''} onClick={() => chooseGirl(role.id)}>
@@ -79,7 +76,9 @@ function CurtainGame({ seat, onCurtain }) {
           ))}
         </div>
       )}
-      <p className="guess-ask">{player ? `يا ${player.nameAr}، مين مديرتك المباشرة؟` : 'اختاري بنت، وخليها تحزر مين مديرتها.'}</p>
+      <p className="guess-ask">
+        {player ? `يا ${player.nameAr}، مين مديرتك المباشرة؟` : watch ? 'سناء بتختار البنت، والقاعة بتتفرج.' : 'اختاري بنت، وخليها تحزر مين مديرتها.'}
+      </p>
       <div className={`curtain ${open ? 'is-open' : ''}`}>
         <div className="curtain-reveal">
           {open && player && (
@@ -92,7 +91,7 @@ function CurtainGame({ seat, onCurtain }) {
         </div>
         <i className="curtain-half is-start" />
         <i className="curtain-half is-end" />
-        {!open && <p className="curtain-wait">اختاري من كل البنات، وبعدين بينكشف الجواب.</p>}
+        {!open && <p className="curtain-wait">{watch ? 'الجواب بينكشف لما سناء تختار.' : 'اختاري من كل البنات، وبعدين بينكشف الجواب.'}</p>}
       </div>
       <div className="guess-options">
         {options.map((item) => (
@@ -100,7 +99,7 @@ function CurtainGame({ seat, onCurtain }) {
             key={item.key}
             type="button"
             className={guess === item.key ? 'is-on' : ''}
-            disabled={!player || open}
+            disabled={watch || !player || open}
             onClick={() => pick(item.key)}
           >
             <strong>{item.nameAr}</strong>
@@ -112,7 +111,7 @@ function CurtainGame({ seat, onCurtain }) {
   )
 }
 
-export default function Briefing({ step = 0, onStep, seat = null, onCurtain = null }) {
+export default function Briefing({ step = 0, onStep, curtain = null, watch = false, onCurtainWho = null, onCurtain = null }) {
   const slide = SLIDES[step] || SLIDES[0]
   const ghazal = roleById(4)
 
@@ -198,7 +197,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
         </div>
       )}
 
-      {step === 2 && <CurtainGame seat={seat} onCurtain={onCurtain} />}
+      {step === 2 && <CurtainGame curtain={curtain} watch={watch} onChoose={onCurtainWho} onPick={onCurtain} />}
 
       {step === 1 && (
         <div className="pyramid">

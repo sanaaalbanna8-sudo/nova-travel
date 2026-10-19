@@ -24,6 +24,7 @@ export function createState() {
     quizIndex: null,
     quizHistory: {},
     ledger: [],
+    curtain: { studentId: 0, guess: '' },
     discussStartedAt: Date.now(),
     updatedAt: Date.now(),
   }
@@ -175,6 +176,12 @@ export function apply(state, action, caseCount) {
         ledger,
       })
     }
+    case 'curtain-who': {
+      if (!studentIdOk(action.studentId)) return state
+      const studentId = Number(action.studentId)
+      if (state.curtain?.studentId === studentId && !state.curtain?.guess) return state
+      return touch({ ...state, curtain: { studentId, guess: '' } })
+    }
     case 'curtain': {
       if (!studentIdOk(action.studentId)) return state
       const key = String(Number(action.studentId))
@@ -182,7 +189,11 @@ export function apply(state, action, caseCount) {
       if (!guess) return state
       const ledger = (state.ledger || []).filter((item) => !(item.kind === 'curtain' && item.studentId === key))
       ledger.push({ kind: 'curtain', studentId: key, guess, at: Date.now() })
-      return touch({ ...state, ledger })
+      return touch({
+        ...state,
+        ledger,
+        curtain: { studentId: Number(action.studentId), guess },
+      })
     }
     case 'arrive': {
       if (!studentIdOk(action.studentId)) return state

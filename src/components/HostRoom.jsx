@@ -13,6 +13,8 @@ import Roster from './Roster'
 import VoteStage from './VoteStage'
 import Briefing, { SLIDES } from './Briefing'
 import { QUIZZES } from '../data/quizzes'
+import { ANSWER_KEY } from '../data/answerKey'
+import { QUIZ_KEY } from '../data/quizKey'
 
 export default function HostRoom({ identity, onLeave }) {
   const meeting = useMeeting(identity)
@@ -101,7 +103,9 @@ export default function HostRoom({ identity, onLeave }) {
           {opening ? (
             <Briefing
               step={state.briefing}
+              curtain={state.curtain}
               onStep={(step) => send({ type: 'brief', step })}
+              onCurtainWho={(studentId) => send({ type: 'curtain-who', studentId })}
               onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
             />
           ) : quizzing ? (
@@ -110,7 +114,7 @@ export default function HostRoom({ identity, onLeave }) {
               {state.phase === 'discuss' ? (
                 <QuizCard item={quiz} total={QUIZZES.length} mode="choices" />
               ) : (
-                <VoteStage item={quiz} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} seconds={15} />
+                <VoteStage item={quiz} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} seconds={15} answer={state.phase === 'results' ? QUIZ_KEY[quiz.id] : null} />
               )}
             </>
           ) : (
@@ -119,7 +123,7 @@ export default function HostRoom({ identity, onLeave }) {
               {state.phase === 'discuss' ? (
                 <CaseCard item={item} mode="choices" />
               ) : (
-                <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+                <VoteStage item={item} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} answer={state.phase === 'results' ? ANSWER_KEY[item.id] : null} />
               )}
             </>
           )}

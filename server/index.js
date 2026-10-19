@@ -48,6 +48,11 @@ function normalize(raw) {
   if (!Number.isInteger(next.quizIndex) || next.quizIndex < 0 || next.quizIndex > QUIZ_MAX) next.quizIndex = null
   if (!next.quizHistory || typeof next.quizHistory !== 'object') next.quizHistory = {}
   if (!Array.isArray(next.ledger)) next.ledger = []
+  const curtainId = Number(next.curtain?.studentId)
+  next.curtain = {
+    studentId: Number.isInteger(curtainId) && curtainId >= 1 && curtainId <= 17 ? curtainId : 0,
+    guess: next.curtain?.guess ? String(next.curtain.guess) : '',
+  }
   return next
 }
 
@@ -84,6 +89,10 @@ function viewFor(client) {
     advice: meeting.advice,
     briefing: meeting.briefing === undefined ? 0 : meeting.briefing,
     quizIndex: Number.isInteger(meeting.quizIndex) ? meeting.quizIndex : null,
+    curtain: {
+      studentId: Number.isInteger(Number(meeting.curtain?.studentId)) ? Number(meeting.curtain.studentId) : 0,
+      guess: meeting.curtain?.guess ? String(meeting.curtain.guess) : '',
+    },
     discussStartedAt: typeof meeting.discussStartedAt === 'number' ? meeting.discussStartedAt : null,
     updatedAt: meeting.updatedAt,
   }

@@ -2,9 +2,10 @@ import { CHOICE_STYLE } from '../config'
 
 const ORDER = ['strategic', 'management', 'operational']
 
-export default function ResultsBoard({ item, summary, myVote = null, compact = false }) {
+export default function ResultsBoard({ item, summary, myVote = null, answer = null, compact = false }) {
   if (!summary) return null
   const { counts, total, percents, levels } = summary
+  const bestTitle = answer?.best ? item.options.find((option) => option.key === answer.best)?.title : ''
 
   return (
     <section className={`case-choices ${compact ? 'overflow-auto' : 'panel p-5 sm:p-7'}`}>
@@ -17,6 +18,13 @@ export default function ResultsBoard({ item, summary, myVote = null, compact = f
           صوّت <span className="font-extrabold text-ink">{total}</span> من 17
         </p>
       </div>
+      {answer?.best && (
+        <p className="vote-answer">
+          الأصح: {answer.best}
+          {bestTitle ? `. ${bestTitle}` : ''}
+          {answer.why ? ` — ${answer.why}` : ''}
+        </p>
+      )}
 
       {total === 0 ? (
         <p className="rounded-2xl border border-line bg-panel2 px-4 py-6 text-center text-mist">لم يُسجَّل أي صوت في هذه الحالة.</p>
@@ -40,6 +48,7 @@ export default function ResultsBoard({ item, summary, myVote = null, compact = f
                   <span className={`font-bold ${CHOICE_STYLE[option.key].text}`}>
                     {option.key}. {option.title}
                     {myVote === option.key ? ' · صوتك' : ''}
+                    {answer?.best === option.key ? ' · الأصح' : ''}
                   </span>
                   <span className="font-extrabold text-ink">
                     {counts[option.key]} · {percents[option.key]}٪

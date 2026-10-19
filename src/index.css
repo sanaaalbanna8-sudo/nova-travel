@@ -195,6 +195,24 @@ input:focus-visible {
 
 .vote-col-top small { color: #8b95a5; }
 
+.vote-answer {
+  margin-top: 0.45rem;
+  color: #0b6a71;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.vote-col.is-answer p { color: #0b6a71; }
+
+.vote-col em {
+  margin-top: 0.2rem;
+  color: #0b6a71;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .vote-shaft {
   display: flex;
   width: 42px;
@@ -1531,6 +1549,10 @@ button.choice-card:hover {
 .guess-options button:disabled:not(.is-on) {
   cursor: default;
   opacity: 0.55;
+}
+
+.guess-game.is-watch .guess-options button:disabled {
+  opacity: 1;
 }
 
 .guess-ask {

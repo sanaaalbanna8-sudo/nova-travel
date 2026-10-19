@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import roles from '../data/roles.json'
-import { BRANCHES, MANAGER_OPTIONS, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
+import { MANAGER_OPTIONS, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME, LEVEL_STYLE } from '../config'
 
 export const SLIDES = [
@@ -110,7 +110,7 @@ export default function Briefing({ step = 0, onStep, seat = null }) {
 
       {step === 0 && (
         <div className="brief-org">
-          <div className="org-chart">
+          <div className="org-chart is-levels">
             <div className="org-tier">
               <article className="org-card is-host">
                 <small>الإدارة العليا</small>
@@ -119,28 +119,20 @@ export default function Briefing({ step = 0, onStep, seat = null }) {
                 <span>المدير التنفيذي العام</span>
               </article>
             </div>
-            <div className="org-tier">
-              <OrgCard role={ghazal} />
-            </div>
-            <div className="org-branches">
-              {BRANCHES.map((branch) => {
-                const lead = roleById(branch.lead)
-                return (
-                  <div key={branch.lead} className={`org-branch ${branch.team.length > 2 ? 'is-wide' : ''}`}>
-                    <OrgCard role={lead} />
-                    {branch.team.length > 0 && (
-                      <div className="org-kids">
-                        {branch.team.map((id) => (
-                          <OrgCard key={id} role={roleById(id)} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            {BANDS.map(([level, label]) => (
+              <div key={level} className={`org-tier lv-${level}`}>
+                <p className="org-level">{label}</p>
+                <div className="org-line">
+                  {roles
+                    .filter((role) => role.level === level)
+                    .map((role) => (
+                      <OrgCard key={role.id} role={role} />
+                    ))}
+                </div>
+              </div>
+            ))}
           </div>
-          <p>المستطيلات والخطوط بس. اسم المديرة لسه مخبّى.</p>
+          <p>كل بنت بمستواها. اسم مديرتها المباشرة مش مكتوب هون.</p>
         </div>
       )}
 

@@ -838,6 +838,29 @@ input:focus-visible {
   -webkit-line-clamp: 2;
 }
 
+.org-chart.is-levels .org-tier + .org-tier {
+  margin-top: 10px;
+}
+
+.org-chart.is-levels .org-tier + .org-tier::before,
+.org-chart.is-levels .org-line::before,
+.org-chart.is-levels .org-card::before {
+  display: none;
+}
+
+.org-chart.is-levels .org-line {
+  flex-wrap: wrap;
+  width: 100%;
+  padding-top: 0;
+}
+
+.org-chart.is-levels .org-card {
+  flex: 1 1 120px;
+  width: auto;
+  min-width: 108px;
+  max-width: 190px;
+}
+
 .org-card em {
   display: block;
   margin-top: 3px;

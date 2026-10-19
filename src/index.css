@@ -1273,9 +1273,11 @@ button.choice-card:hover {
 
 .guess-cast,
 .guess-options {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
+  max-height: 46vh;
+  overflow: auto;
 }
 
 .guess-cast button,
@@ -1288,6 +1290,13 @@ button.choice-card:hover {
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+}
+
+.guess-cast {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: none;
+  overflow: visible;
 }
 
 .guess-cast button {
@@ -1304,9 +1313,10 @@ button.choice-card:hover {
 }
 
 .guess-options button b {
-  color: #8a6420;
-  font-size: 0.58rem;
-  font-weight: 800;
+  color: #3d4654;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .guess-cast button.is-on,
@@ -1315,7 +1325,7 @@ button.choice-card:hover {
   box-shadow: inset 0 0 0 2px #c9a227;
 }
 
-.guess-options button:disabled {
+.guess-options button:disabled:not(.is-on) {
   cursor: default;
   opacity: 0.55;
 }
@@ -1329,15 +1339,26 @@ button.choice-card:hover {
 
 .curtain {
   position: relative;
-  min-height: 168px;
+  min-height: 112px;
   overflow: hidden;
   border-radius: 18px;
   background: #fff8ea;
 }
 
+.curtain-wait {
+  position: relative;
+  z-index: 3;
+  margin: 0;
+  padding: 28px 16px;
+  color: #fff8ea;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .curtain-reveal {
   display: flex;
-  min-height: 168px;
+  min-height: 112px;
   flex-direction: column;
   align-items: center;
   justify-content: center;

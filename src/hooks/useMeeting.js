@@ -145,6 +145,8 @@ export function useMeeting(identity) {
             minutes: action.minutes,
             choice: action.choice,
             step: action.step,
+            studentId: action.studentId,
+            guess: action.guess,
           }),
         )
       }

@@ -110,6 +110,15 @@ export function apply(state, action, caseCount) {
         ledger,
       })
     }
+    case 'curtain': {
+      if (!studentIdOk(action.studentId)) return state
+      const key = String(Number(action.studentId))
+      const guess = String(action.guess || '')
+      if (!guess) return state
+      const ledger = (state.ledger || []).filter((item) => !(item.kind === 'curtain' && item.studentId === key))
+      ledger.push({ kind: 'curtain', studentId: key, guess, at: Date.now() })
+      return touch({ ...state, ledger })
+    }
     case 'arrive': {
       if (!studentIdOk(action.studentId)) return state
       const key = String(Number(action.studentId))

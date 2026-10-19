@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import roles from '../data/roles.json'
-import { MANAGER_OPTIONS, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
+import { BRANCHES, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME, LEVEL_STYLE } from '../config'
 
 export const SLIDES = [
@@ -28,19 +28,35 @@ function OrgCard({ role }) {
   )
 }
 
-function CurtainGame({ seat }) {
+function taskOf(id) {
+  return WORKFLOW.find((item) => item.id === id)?.verb || ''
+}
+
+function CurtainGame({ seat, onCurtain }) {
   const [who, setWho] = useState(seat?.id || null)
   const [guess, setGuess] = useState(null)
   const [open, setOpen] = useState(false)
   const player = who ? roleById(who) : null
   const answer = player ? managerKey(player.id) : null
-  const options = MANAGER_OPTIONS.filter((item) => item.key !== String(who || ''))
+  const options = [
+    { key: 'host', nameAr: HOST_NAME, task: 'تثبت قرار الإدارة العليا' },
+    ...roles
+      .filter((role) => role.id !== who)
+      .map((role) => ({ key: String(role.id), nameAr: role.nameAr, task: taskOf(role.id) })),
+  ]
   const right = open && guess === answer
 
   const chooseGirl = (id) => {
     setWho(id)
     setGuess(null)
     setOpen(false)
+  }
+
+  const pick = (key) => {
+    if (!player || open) return
+    setGuess(key)
+    setOpen(true)
+    onCurtain?.(player.id, key)
   }
 
   return (
@@ -55,20 +71,6 @@ function CurtainGame({ seat }) {
         </div>
       )}
       <p className="guess-ask">{player ? `يا ${player.nameAr}، مين مديرتك المباشرة؟` : 'اختاري بنت، وخليها تحزر مين مديرتها.'}</p>
-      <div className="guess-options">
-        {options.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            className={guess === item.key ? 'is-on' : ''}
-            disabled={!player || open}
-            onClick={() => setGuess(item.key)}
-          >
-            <strong>{item.nameAr}</strong>
-            <b>{item.name}</b>
-          </button>
-        ))}
-      </div>
       <div className={`curtain ${open ? 'is-open' : ''}`}>
         <div className="curtain-reveal">
           {open && player && (
@@ -81,17 +83,27 @@ function CurtainGame({ seat }) {
         </div>
         <i className="curtain-half is-start" />
         <i className="curtain-half is-end" />
-        {!open && (
-          <button className="btn-gold curtain-open" type="button" disabled={!player || !guess} onClick={() => setOpen(true)}>
-            اكشفي الستار
+        {!open && <p className="curtain-wait">اختاري من كل البنات، وبعدين بينكشف الجواب.</p>}
+      </div>
+      <div className="guess-options">
+        {options.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            className={guess === item.key ? 'is-on' : ''}
+            disabled={!player || open}
+            onClick={() => pick(item.key)}
+          >
+            <strong>{item.nameAr}</strong>
+            <b>{item.task}</b>
           </button>
-        )}
+        ))}
       </div>
     </div>
   )
 }
 
-export default function Briefing({ step = 0, onStep, seat = null }) {
+export default function Briefing({ step = 0, onStep, seat = null, onCurtain = null }) {
   const slide = SLIDES[step] || SLIDES[0]
   const ghazal = roleById(4)
 
@@ -110,7 +122,7 @@ export default function Briefing({ step = 0, onStep, seat = null }) {
 
       {step === 0 && (
         <div className="brief-org">
-          <div className="org-chart is-levels">
+          <div className="org-chart">
             <div className="org-tier">
               <article className="org-card is-host">
                 <small>الإدارة العليا</small>
@@ -119,24 +131,31 @@ export default function Briefing({ step = 0, onStep, seat = null }) {
                 <span>المدير التنفيذي العام</span>
               </article>
             </div>
-            {BANDS.map(([level, label]) => (
-              <div key={level} className={`org-tier lv-${level}`}>
-                <p className="org-level">{label}</p>
-                <div className="org-line">
-                  {roles
-                    .filter((role) => role.level === level)
-                    .map((role) => (
-                      <OrgCard key={role.id} role={role} />
-                    ))}
-                </div>
-              </div>
-            ))}
+            <div className="org-tier">
+              <OrgCard role={ghazal} />
+            </div>
+            <div className="org-branches">
+              {BRANCHES.map((branch) => {
+                const lead = roleById(branch.lead)
+                return (
+                  <div key={branch.lead} className={`org-branch ${branch.team.length > 2 ? 'is-wide' : ''}`}>
+                    <OrgCard role={lead} />
+                    {branch.team.length > 0 && (
+                      <div className="org-kids">
+                        {branch.team.map((id) => (
+                          <OrgCard key={id} role={roleById(id)} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <p>كل بنت بمستواها. اسم مديرتها المباشرة مش مكتوب هون.</p>
         </div>
       )}
 
-      {step === 1 && <CurtainGame seat={seat} />}
+      {step === 1 && <CurtainGame seat={seat} onCurtain={onCurtain} />}
 
       {step === 2 && (
         <div className="pyramid">

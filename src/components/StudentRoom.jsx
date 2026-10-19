@@ -64,7 +64,12 @@ export default function StudentRoom({ identity, onLeave }) {
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
-            <Briefing step={state.briefing} seat={role} onStep={(step) => send({ type: 'brief', step })} />
+            <Briefing
+              step={state.briefing}
+              seat={role}
+              onStep={(step) => send({ type: 'brief', step })}
+              onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
+            />
           ) : (
             <>
           <CaseCard item={item} mode="story" />

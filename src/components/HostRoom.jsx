@@ -95,7 +95,11 @@ export default function HostRoom({ identity, onLeave }) {
         {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
         <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>
           {opening ? (
-            <Briefing step={state.briefing} onStep={(step) => send({ type: 'brief', step })} />
+            <Briefing
+              step={state.briefing}
+              onStep={(step) => send({ type: 'brief', step })}
+              onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
+            />
           ) : (
             <>
               <CaseCard item={item} mode="story" />
@@ -112,6 +116,24 @@ export default function HostRoom({ identity, onLeave }) {
                 <button className="btn-ghost" disabled={state.briefing === 0} onClick={() => send({ type: 'brief', step: state.briefing - 1 })}>
                   الشريحة السابقة
                 </button>
+                {state.briefing === 1 && (
+                  <button
+                    className="btn-ghost"
+                    onClick={() => {
+                      const rows = (state.ledger || [])
+                        .filter((item) => item.kind === 'curtain')
+                        .map((item) => {
+                          const girl = roles.find((role) => String(role.id) === String(item.studentId))
+                          const guess = item.guess === 'host' ? HOST_NAME : roles.find((role) => String(role.id) === String(item.guess))?.nameAr || ''
+                          return `${girl?.nameAr || ''}\t${guess}`
+                        })
+                        .join('\n')
+                      if (rows) navigator.clipboard?.writeText(rows)
+                    }}
+                  >
+                    انسخي السجل للجدول
+                  </button>
+                )}
                 {state.briefing < SLIDES.length - 1 ? (
                   <button className="btn-gold" onClick={() => send({ type: 'brief', step: state.briefing + 1 })}>
                     {SLIDES[state.briefing + 1].title}

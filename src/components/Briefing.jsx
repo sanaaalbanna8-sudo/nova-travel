@@ -271,10 +271,6 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
       {step === 5 && (
         <ol className="infer-list">
           <li>
-            <b>مين مديرك المباشر؟</b>
-            <span>من شريحة كشف الستار. إذا الستار لسه مسكّر، احزري من مكانك في الهيكل.</span>
-          </li>
-          <li>
             <b>لو الشركة حقيقية، شو أول مهمة لك هذا الأسبوع؟</b>
             <span>مهمة واحدة تقدرين تكمّلينها، مش عنوان الوظيفة.</span>
           </li>

@@ -161,7 +161,7 @@ export function useMeeting(identity) {
       const base = current || readLocal()
       const next = apply(
         base,
-        action.type === 'vote' ? { ...action, studentId: identityRef.current.studentId } : action,
+        action.type === 'vote' || action.type === 'arrive' ? { ...action, studentId: identityRef.current.studentId } : action,
         cases.length,
       )
       if (next === base) return base

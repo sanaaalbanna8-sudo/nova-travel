@@ -18,6 +18,7 @@ export function createState() {
     voteEndsAt: null,
     history: {},
     briefing: 0,
+    ledger: [],
     updatedAt: Date.now(),
   }
 }
@@ -92,9 +93,26 @@ export function apply(state, action, caseCount) {
       if (!CHOICES.includes(action.choice)) return state
       const key = String(Number(action.studentId))
       if (state.votes[key] === action.choice) return state
+      const caseId = state.caseIndex + 1
+      const opened = typeof state.voteEndsAt === 'number' ? state.voteEndsAt - VOTE_SECONDS * 1000 : Date.now()
+      const ms = Math.max(0, Date.now() - opened)
+      const ledger = [...(state.ledger || [])]
+      const prior = ledger.find((item) => item.kind === 'vote' && item.studentId === key && item.caseId === caseId)
+      if (prior) prior.choice = action.choice
+      else ledger.push({ kind: 'vote', studentId: key, caseId, choice: action.choice, ms, at: Date.now() })
       return touch({
         ...state,
         votes: { ...state.votes, [key]: action.choice },
+        ledger,
+      })
+    }
+    case 'arrive': {
+      if (!studentIdOk(action.studentId)) return state
+      const key = String(Number(action.studentId))
+      if ((state.ledger || []).some((item) => item.kind === 'arrive' && item.studentId === key)) return state
+      return touch({
+        ...state,
+        ledger: [...(state.ledger || []), { kind: 'arrive', studentId: key, at: Date.now() }],
       })
     }
     case 'clear-votes':
@@ -108,6 +126,7 @@ export function apply(state, action, caseCount) {
           [state.caseIndex]: { phase: PHASE.discuss, votes: {}, advice: null, voteEndsAt: null },
         },
         voteEndsAt: null,
+        ledger: (state.ledger || []).filter((item) => !(item.kind === 'vote' && item.caseId === state.caseIndex + 1)),
       })
     case 'timer': {
       const minutes = Number(action.minutes)

@@ -46,6 +46,7 @@ function normalize(raw) {
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
   if (next.briefing !== null && next.briefing !== 0 && next.briefing !== 1 && next.briefing !== 2 && next.briefing !== 3) next.briefing = 0
+  if (!Array.isArray(next.ledger)) next.ledger = []
   return next
 }
 
@@ -87,6 +88,7 @@ function viewFor(client) {
     return {
       ...base,
       votes: meeting.votes,
+      ledger: meeting.ledger || [],
       votedCases: votedCaseIndexes(meeting),
       summary: meeting.phase === PHASE.results ? summarize(meeting.votes, roles) : null,
     }
@@ -184,6 +186,7 @@ wss.on('connection', (ws) => {
         }
         ws.studentId = studentId
         ws.joined = true
+        commit(apply(meeting, { type: 'arrive', studentId }, cases.length))
       } else {
         return
       }

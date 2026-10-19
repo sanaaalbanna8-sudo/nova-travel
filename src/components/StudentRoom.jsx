@@ -17,6 +17,10 @@ export default function StudentRoom({ identity, onLeave }) {
   const secondsLeft = useVoteSeconds(state?.voteEndsAt, state?.phase === 'voting')
 
   useEffect(() => {
+    if (status === 'local') send({ type: 'arrive' })
+  }, [status])
+
+  useEffect(() => {
     if (!role) return undefined
     document.title = `${role.title} | ${BRAND_EN}`
     return () => {

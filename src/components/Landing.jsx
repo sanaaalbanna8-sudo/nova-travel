@@ -59,25 +59,22 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
       {step === 'student' && !role && (
         <div className="mt-6">
           <div className="mb-6">
-            <h2 className="font-display text-4xl text-ink">الرقم الوظيفي</h2>
-            <p className="mt-2 text-sm text-mist">يُختار الرقم الذي وُزّع في بداية الاجتماع.</p>
+            <h2 className="font-display text-4xl text-ink">اختاري اسمك</h2>
+            <p className="mt-2 text-sm text-mist">اضغطي على اسمك للدخول إلى مقعدك.</p>
           </div>
-          <div className="panel p-4 sm:p-5">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <span className="text-sm font-extrabold text-ink">اختاري الرقم الذي أخذتِه</span>
-              <span className="text-xs text-faint">1 – 17</span>
-            </div>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-              {roles.map((item) => (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[...roles]
+              .sort((a, b) => a.nameAr.localeCompare(b.nameAr, 'ar'))
+              .map((item) => (
                 <button
                   key={item.id}
-                  className="rounded-2xl border border-line bg-white py-4 text-xl font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-gold"
+                  className="rounded-2xl border border-line bg-white px-4 py-3 text-right shadow-sm transition hover:-translate-y-0.5 hover:border-gold"
                   onClick={() => setPicked(item.id)}
                 >
-                  {item.id}
+                  <strong className="block text-lg text-ink">{item.nameAr}</strong>
+                  <span className="mt-1 block text-xs font-bold tracking-wide text-faint">{item.name}</span>
                 </button>
               ))}
-            </div>
           </div>
         </div>
       )}
@@ -101,7 +98,7 @@ export default function Landing({ gate = 'student', error = '', onHost, onStuden
               تأكيد الهوية ودخول القاعة
             </button>
             <button className="btn-ghost" onClick={() => setPicked(null)}>
-              رقم آخر
+              اسم آخر
             </button>
           </div>
         </div>

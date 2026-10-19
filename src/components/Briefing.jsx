@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import roles from '../data/roles.json'
 import { BRANCHES, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME, LEVEL_STYLE } from '../config'
@@ -8,9 +8,17 @@ export const SLIDES = [
   { id: 'pyramid', kicker: 'قبل الحالات', title: 'الهرم التنظيمي' },
   { id: 'guess', kicker: 'قبل الحالات', title: 'كشف الستار' },
   { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
-  { id: 'flow', kicker: 'قبل الحالات', title: 'مسار الشغل' },
+  { id: 'flow', kicker: 'قبل الحالات', title: 'دورة البيانات' },
   { id: 'infer', kicker: 'قبل الحالات', title: 'أسئلة الاستنتاج' },
   { id: 'policy', kicker: 'معرفة سابقة · الهدف ج', title: 'السياسات والتهديدات' },
+]
+
+const CYCLE = [
+  { id: 'born', title: 'تولد', hint: 'أول اليوم', ids: [7, 9, 12] },
+  { id: 'check', title: 'تنضبط', hint: 'قبل الحفظ', ids: [1, 15, 5, 14] },
+  { id: 'keep', title: 'تنحفظ', hint: 'وتصير رقم', ids: [10, 8, 16] },
+  { id: 'out', title: 'تطلع', hint: 'للضيف والناس', ids: [3, 13, 2] },
+  { id: 'close', title: 'تنحسم', hint: 'وترجع', ids: [11, 17, 6, 4] },
 ]
 
 const BANDS = [
@@ -229,19 +237,34 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
       )}
 
       {step === 4 && (
-        <div className="brief-org">
-          <ol className="life-flow">
-            {WORKFLOW.map((item, index) => {
-              const role = roleById(item.id)
-              return (
-                <li key={role.id}>
-                  <i>{index + 1}</i>
-                  <b>{item.verb}</b>
-                  <span>{role.nameAr}</span>
-                </li>
-              )
-            })}
-          </ol>
+        <div className="life-cycle">
+          <div className="life-ring">
+            {CYCLE.map((stage, index) => (
+              <Fragment key={stage.id}>
+                <article className={`life-stage is-${stage.id}`}>
+                  <header>
+                    <small>{index + 1}</small>
+                    <strong>{stage.title}</strong>
+                    <em>{stage.hint}</em>
+                  </header>
+                  <ul>
+                    {stage.ids.map((id) => {
+                      const role = roleById(id)
+                      const verb = WORKFLOW.find((item) => item.id === id)?.verb
+                      return (
+                        <li key={id}>
+                          <b>{role.nameAr}</b>
+                          <span>{verb}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </article>
+                {index < CYCLE.length - 1 && <i className="life-arrow" aria-hidden="true">←</i>}
+              </Fragment>
+            ))}
+          </div>
+          <p className="life-return">قرار غزل يفتح يوماً جديداً: نرجع نراقب السوق، نحدّث الحجز، ونجمع من الضيف.</p>
         </div>
       )}
 

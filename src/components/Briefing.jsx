@@ -311,7 +311,7 @@ export default function Briefing({ step = 0, onStep, seat = null, onCurtain = nu
 
       <p className="brief-step">
         {step + 1} / {SLIDES.length}
-        <span className={`chip ${LEVEL_STYLE.strategic.chip}`}>ثم تبدأ الحالات</span>
+        <span className={`chip ${LEVEL_STYLE.strategic.chip}`}>ثم أسئلة سريعة</span>
       </p>
     </section>
   )

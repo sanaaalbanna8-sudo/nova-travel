@@ -7,6 +7,7 @@ export const PHASE = {
 export const CHOICES = ['A', 'B', 'C']
 export const VOTE_SECONDS = 12
 export const BRIEF_MAX = 6
+export const QUIZ_MAX = 9
 
 export function createState() {
   return {
@@ -19,6 +20,8 @@ export function createState() {
     voteEndsAt: null,
     history: {},
     briefing: 0,
+    quizIndex: null,
+    quizHistory: {},
     ledger: [],
     discussStartedAt: Date.now(),
     updatedAt: Date.now(),
@@ -41,6 +44,34 @@ function snapshot(state) {
     advice: state.advice || null,
     voteEndsAt: state.voteEndsAt || null,
   }
+}
+
+function inQuiz(state) {
+  return Number.isInteger(state.quizIndex) && typeof state.briefing !== 'number'
+}
+
+function rememberQuiz(state) {
+  if (!Number.isInteger(state.quizIndex)) return state.quizHistory || {}
+  return { ...(state.quizHistory || {}), [state.quizIndex]: snapshot(state) }
+}
+
+function moveQuiz(state, index) {
+  if (!Number.isInteger(index) || index < 0 || index > QUIZ_MAX) return state
+  if (index === state.quizIndex) return state
+  const quizHistory = rememberQuiz(state)
+  const saved = quizHistory[index]
+  const phase = saved?.phase || PHASE.discuss
+  return touch({
+    ...state,
+    quizHistory,
+    quizIndex: index,
+    phase,
+    votes: saved?.votes ? { ...saved.votes } : {},
+    advice: null,
+    timerEndsAt: null,
+    voteEndsAt: saved?.voteEndsAt || null,
+    discussStartedAt: phase === PHASE.discuss ? Date.now() : state.discussStartedAt || null,
+  })
 }
 
 function moveTo(state, index, caseCount) {
@@ -80,10 +111,15 @@ export function apply(state, action, caseCount) {
       if (state.phase !== PHASE.voting) return state
       return touch({ ...state, phase: PHASE.results, timerEndsAt: null, voteEndsAt: null })
     case 'goto':
+      if (inQuiz(state)) return state
       return moveTo(state, action.caseIndex, caseCount)
     case 'next':
+      if (inQuiz(state)) return moveQuiz(state, state.quizIndex + 1)
+      if (typeof state.briefing === 'number') return state
       return moveTo(state, state.caseIndex + 1, caseCount)
     case 'prev':
+      if (inQuiz(state)) return moveQuiz(state, state.quizIndex - 1)
+      if (typeof state.briefing === 'number') return state
       return moveTo(state, state.caseIndex - 1, caseCount)
     case 'advise': {
       if (state.phase !== PHASE.discuss) return state
@@ -97,13 +133,20 @@ export function apply(state, action, caseCount) {
       if (!CHOICES.includes(action.choice)) return state
       const key = String(Number(action.studentId))
       if (state.votes[key] === action.choice) return state
-      const caseId = state.caseIndex + 1
       const opened = typeof state.voteEndsAt === 'number' ? state.voteEndsAt - VOTE_SECONDS * 1000 : Date.now()
       const ms = Math.max(0, Date.now() - opened)
       const ledger = [...(state.ledger || [])]
-      const prior = ledger.find((item) => item.kind === 'vote' && item.studentId === key && item.caseId === caseId)
-      if (prior) prior.choice = action.choice
-      else ledger.push({ kind: 'vote', studentId: key, caseId, choice: action.choice, ms, at: Date.now() })
+      if (inQuiz(state)) {
+        const quizId = state.quizIndex + 1
+        const prior = ledger.find((item) => item.kind === 'quiz' && item.studentId === key && item.quizId === quizId)
+        if (prior) prior.choice = action.choice
+        else ledger.push({ kind: 'quiz', studentId: key, quizId, choice: action.choice, ms, at: Date.now() })
+      } else {
+        const caseId = state.caseIndex + 1
+        const prior = ledger.find((item) => item.kind === 'vote' && item.studentId === key && item.caseId === caseId)
+        if (prior) prior.choice = action.choice
+        else ledger.push({ kind: 'vote', studentId: key, caseId, choice: action.choice, ms, at: Date.now() })
+      }
       return touch({
         ...state,
         votes: { ...state.votes, [key]: action.choice },
@@ -129,6 +172,22 @@ export function apply(state, action, caseCount) {
       })
     }
     case 'clear-votes':
+      if (inQuiz(state)) {
+        const quizId = state.quizIndex + 1
+        return touch({
+          ...state,
+          votes: {},
+          advice: null,
+          phase: PHASE.discuss,
+          quizHistory: {
+            ...(state.quizHistory || {}),
+            [state.quizIndex]: { phase: PHASE.discuss, votes: {}, advice: null, voteEndsAt: null },
+          },
+          voteEndsAt: null,
+          discussStartedAt: Date.now(),
+          ledger: (state.ledger || []).filter((item) => !(item.kind === 'quiz' && item.quizId === quizId)),
+        })
+      }
       return touch({
         ...state,
         votes: {},
@@ -148,13 +207,53 @@ export function apply(state, action, caseCount) {
         Number.isFinite(minutes) && minutes > 0 ? Date.now() + minutes * 60 * 1000 : null
       return touch({ ...state, timerEndsAt })
     }
+    case 'quiz-start': {
+      if (inQuiz(state)) return state
+      const index = Number.isInteger(state.quizIndex) ? state.quizIndex : 0
+      const fromCases = typeof state.briefing !== 'number'
+      const history = fromCases ? { ...state.history, [state.caseIndex]: snapshot(state) } : state.history
+      const quizHistory = state.quizHistory || {}
+      const saved = quizHistory[index]
+      const phase = saved?.phase || PHASE.discuss
+      return touch({
+        ...state,
+        history,
+        briefing: null,
+        quizHistory,
+        quizIndex: index,
+        phase,
+        votes: saved?.votes ? { ...saved.votes } : {},
+        advice: null,
+        voteEndsAt: saved?.voteEndsAt || null,
+        timerEndsAt: null,
+        discussStartedAt: phase === PHASE.discuss ? Date.now() : state.discussStartedAt || null,
+      })
+    }
+    case 'quiz-end':
+      if (!Number.isInteger(state.quizIndex) && typeof state.briefing !== 'number') return state
+      return touch({
+        ...state,
+        quizHistory: rememberQuiz(state),
+        quizIndex: null,
+        briefing: null,
+        caseIndex: 0,
+        phase: PHASE.discuss,
+        votes: {},
+        advice: null,
+        summary: null,
+        voteEndsAt: null,
+        timerEndsAt: null,
+        discussStartedAt: Date.now(),
+      })
     case 'brief': {
       const step = action.step
       if (step !== null && (!Number.isInteger(step) || step < 0 || step > BRIEF_MAX)) return state
-      if (state.briefing === step) return state
+      if (state.briefing === step && !Number.isInteger(state.quizIndex)) return state
       if (step === null) {
         return touch({
           ...state,
+          quizHistory: rememberQuiz(state),
+          quizIndex: null,
           briefing: null,
           caseIndex: 0,
           phase: PHASE.discuss,
@@ -163,6 +262,16 @@ export function apply(state, action, caseCount) {
           advice: null,
           voteEndsAt: null,
           timerEndsAt: null,
+          discussStartedAt: Date.now(),
+        })
+      }
+      if (inQuiz(state)) {
+        return touch({
+          ...state,
+          quizHistory: rememberQuiz(state),
+          briefing: step,
+          phase: PHASE.discuss,
+          voteEndsAt: null,
           discussStartedAt: Date.now(),
         })
       }

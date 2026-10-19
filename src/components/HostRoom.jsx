@@ -8,9 +8,11 @@ import { seatHref } from '../paths'
 import { Modal, Shell, useCountdown, useElapsed } from './Shell'
 import { armVoteSound, playVoteOpen } from '../lib/voteSound'
 import CaseCard from './CaseCard'
+import QuizCard from './QuizCard'
 import Roster from './Roster'
 import VoteStage from './VoteStage'
 import Briefing, { SLIDES } from './Briefing'
+import { QUIZZES } from '../data/quizzes'
 
 export default function HostRoom({ identity, onLeave }) {
   const meeting = useMeeting(identity)
@@ -64,6 +66,8 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   const opening = state.briefing !== null && state.briefing !== undefined
+  const quizzing = !opening && Number.isInteger(state.quizIndex)
+  const quiz = quizzing ? QUIZZES[state.quizIndex] : null
 
   const askMove = (action) => {
     const dirty = state.phase !== 'discuss' || voteCount > 0
@@ -90,9 +94,9 @@ export default function HostRoom({ identity, onLeave }) {
   }
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={state.briefing === null ? (state.caseIndex + 1) / cases.length : (state.briefing + 1) / SLIDES.length}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={opening ? (state.briefing + 1) / SLIDES.length : quizzing ? (state.quizIndex + 1) / QUIZZES.length : (state.caseIndex + 1) / cases.length}>
       <div className={`board ${opening ? 'is-opening' : ''}`}>
-        {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={item.addressedTo} />}
+        {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={quizzing ? null : item.addressedTo} />}
         <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>
           {opening ? (
             <Briefing
@@ -100,6 +104,15 @@ export default function HostRoom({ identity, onLeave }) {
               onStep={(step) => send({ type: 'brief', step })}
               onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
             />
+          ) : quizzing ? (
+            <>
+              <QuizCard item={quiz} total={QUIZZES.length} mode="story" />
+              {state.phase === 'discuss' ? (
+                <QuizCard item={quiz} total={QUIZZES.length} mode="choices" />
+              ) : (
+                <VoteStage item={quiz} phase={state.phase} endsAt={state.voteEndsAt} votes={state.votes} />
+              )}
+            </>
           ) : (
             <>
               <CaseCard item={item} mode="story" />
@@ -139,10 +152,54 @@ export default function HostRoom({ identity, onLeave }) {
                     {SLIDES[state.briefing + 1].title}
                   </button>
                 ) : (
-                  <button className="btn-gold" onClick={() => send({ type: 'brief', step: null })}>
+                  <button className="btn-gold" onClick={() => send({ type: 'quiz-start' })}>
+                    أسئلة سريعة
+                  </button>
+                )}
+              </>
+            ) : quizzing ? (
+              <>
+                <button
+                  className="btn-gold"
+                  disabled={state.phase === 'voting'}
+                  onClick={() => {
+                    armVoteSound()
+                    playVoteOpen()
+                    send({ type: 'open' })
+                  }}
+                >
+                  فتح التصويت · 12 ث
+                </button>
+                <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
+                  إغلاق وعرض النتائج{state.phase === 'voting' ? ` (${voteCount}/17)` : ''}
+                </button>
+                <button className="btn-ghost" disabled={state.quizIndex === 0} onClick={() => send({ type: 'prev' })}>
+                  السابق
+                </button>
+                {state.quizIndex < QUIZZES.length - 1 ? (
+                  <button className="btn-ghost" onClick={() => send({ type: 'next' })}>
+                    التالي
+                  </button>
+                ) : (
+                  <button className="btn-ghost" onClick={() => send({ type: 'quiz-end' })}>
                     ابدئي الحالات
                   </button>
                 )}
+                <button
+                  className="btn-ghost"
+                  onClick={() => {
+                    const rows = (state.ledger || [])
+                      .filter((entry) => entry.kind === 'quiz')
+                      .map((entry) => {
+                        const girl = roles.find((role) => String(role.id) === String(entry.studentId))
+                        return `${girl?.nameAr || ''}\t${entry.quizId}\t${entry.choice}`
+                      })
+                      .join('\n')
+                    if (rows) navigator.clipboard?.writeText(rows)
+                  }}
+                >
+                  انسخي الأصوات
+                </button>
               </>
             ) : (
               <>
@@ -174,7 +231,9 @@ export default function HostRoom({ identity, onLeave }) {
             <span className="me-auto text-xs font-bold text-mist">
               {opening
                 ? `${SLIDES[state.briefing].title} · ${state.briefing + 1} / ${SLIDES.length}`
-                : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
+                : quizzing
+                  ? `سؤال ${quiz.id} / ${QUIZZES.length} · ${PHASE_LABEL[state.phase]} · ${voteCount}/17`
+                  : `${String(item.id).padStart(2, '0')} / ${cases.length} · ${PHASE_LABEL[state.phase]}${clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''} · ${voteCount}/17`}
             </span>
             {!present && (
               <button className="btn-ghost" onClick={() => setTools((value) => !value)}>
@@ -201,12 +260,15 @@ export default function HostRoom({ identity, onLeave }) {
               ملاحظة المضيف
               <span className="text-xs text-faint">{showNotes ? 'إخفاء' : 'إظهار'}</span>
             </button>
-            {showNotes && (
+            {showNotes && !quizzing && (
               <div className="space-y-2 text-sm leading-7 text-mist">
                 {item.hostNotes.map((note) => (
                   <p key={note}>{note}</p>
                 ))}
               </div>
+            )}
+            {showNotes && quizzing && (
+              <p className="text-sm leading-7 text-mist">الجواب الأقرب للدرس ما بينعرض على الشاشة. الأصوات تنحفظ في السجل، وزر انسخي الأصوات يجهّزها للجدول.</p>
             )}
             <div className="grid grid-cols-3 gap-2">
               {[5, item.minutes, 10].map((minutes) => (
@@ -221,6 +283,14 @@ export default function HostRoom({ identity, onLeave }) {
             <button className="btn-ghost w-full" onClick={() => send({ type: 'brief', step: 0 })}>
               شرائح التعريف
             </button>
+            <button className="btn-ghost w-full" onClick={() => send({ type: 'quiz-start' })}>
+              أسئلة سريعة
+            </button>
+            {(opening || quizzing) && (
+              <button className="btn-ghost w-full" onClick={() => send({ type: 'quiz-end' })}>
+                ابدئي الحالات
+              </button>
+            )}
             <button className="btn-ghost w-full" onClick={() => setModal('roles')}>
               دليل الأدوار
             </button>

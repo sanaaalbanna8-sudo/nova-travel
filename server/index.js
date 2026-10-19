@@ -5,7 +5,7 @@ import { createServer } from 'http'
 import { fileURLToPath } from 'url'
 import express from 'express'
 import { WebSocketServer } from 'ws'
-import { apply, BRIEF_MAX, createState, PHASE, summarize, votedCaseIndexes } from '../shared/meeting.js'
+import { apply, BRIEF_MAX, createState, PHASE, QUIZ_MAX, summarize, votedCaseIndexes } from '../shared/meeting.js'
 import { loadJson, validateData } from './check-data.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -45,6 +45,8 @@ function normalize(raw) {
   if (!next.history || typeof next.history !== 'object') next.history = {}
   if (typeof next.voteEndsAt !== 'number') next.voteEndsAt = null
   if (next.briefing !== null && (!Number.isInteger(next.briefing) || next.briefing < 0 || next.briefing > BRIEF_MAX)) next.briefing = 0
+  if (!Number.isInteger(next.quizIndex) || next.quizIndex < 0 || next.quizIndex > QUIZ_MAX) next.quizIndex = null
+  if (!next.quizHistory || typeof next.quizHistory !== 'object') next.quizHistory = {}
   if (!Array.isArray(next.ledger)) next.ledger = []
   return next
 }
@@ -81,6 +83,7 @@ function viewFor(client) {
     voteEndsAt: meeting.voteEndsAt,
     advice: meeting.advice,
     briefing: meeting.briefing === undefined ? 0 : meeting.briefing,
+    quizIndex: Number.isInteger(meeting.quizIndex) ? meeting.quizIndex : null,
     discussStartedAt: typeof meeting.discussStartedAt === 'number' ? meeting.discussStartedAt : null,
     updatedAt: meeting.updatedAt,
   }

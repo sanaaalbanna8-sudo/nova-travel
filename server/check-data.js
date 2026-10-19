@@ -87,6 +87,20 @@ function assertMeetingFlow() {
     throw new Error('تجميع المستويات غير صحيح')
   }
   if (!votedCaseIndexes(state).includes(0)) throw new Error('وسم الحالات المصوّت عليها ناقص')
+  let quiz = createState()
+  quiz = apply(quiz, { type: 'quiz-start' }, 20)
+  if (quiz.briefing !== null || quiz.quizIndex !== 0) throw new Error('لم تبدأ الأسئلة السريعة')
+  quiz = apply(quiz, { type: 'open' }, 20)
+  quiz = apply(quiz, { type: 'vote', studentId: 2, choice: 'C' }, 20)
+  const saved = quiz.ledger.find((item) => item.kind === 'quiz' && item.quizId === 1)
+  if (!saved || saved.choice !== 'C' || quiz.votes['2'] !== 'C') throw new Error('لم يُحفظ صوت السؤال السريع')
+  quiz = apply(quiz, { type: 'next' }, 20)
+  if (quiz.quizIndex !== 1 || Object.keys(quiz.votes).length !== 0) throw new Error('السؤال التالي لم يفصل الأصوات')
+  quiz = apply(quiz, { type: 'prev' }, 20)
+  if (quiz.votes['2'] !== 'C') throw new Error('العودة لم تسترجع صوت السؤال السريع')
+  quiz = apply(quiz, { type: 'quiz-end' }, 20)
+  if (quiz.quizIndex !== null || quiz.votes['2']) throw new Error('إنهاء الأسئلة لم يرجّع الحالات فارغة')
+  if (!quiz.quizHistory[0] || quiz.quizHistory[0].votes['2'] !== 'C') throw new Error('سجل السؤال السريع ضاع')
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)

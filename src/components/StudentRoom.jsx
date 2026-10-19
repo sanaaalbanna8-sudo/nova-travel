@@ -9,6 +9,8 @@ import { Shell, useCountdown, useElapsed } from './Shell'
 import CaseCard from './CaseCard'
 import ResultsBoard from './ResultsBoard'
 import Briefing from './Briefing'
+import QuizCard from './QuizCard'
+import { QUIZZES } from '../data/quizzes'
 import { useVoteSeconds } from './VoteStage'
 
 export default function StudentRoom({ identity, onLeave }) {
@@ -54,13 +56,15 @@ export default function StudentRoom({ identity, onLeave }) {
   }
 
   const opening = state.briefing !== null && state.briefing !== undefined
+  const quizzing = !opening && Number.isInteger(state.quizIndex)
+  const quiz = quizzing ? QUIZZES[state.quizIndex] : null
   const item = cases[state.caseIndex] || cases[0]
   const myVote = state.votes ? state.votes[String(role.id)] || null : state.myVote || null
   const summary = state.phase === 'results' ? state.summary || summarize(state.votes || {}, roles) : null
   const votingOpen = state.phase === 'voting'
 
   return (
-    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage clock={elapsed} progress={opening ? (state.briefing + 1) / SLIDES.length : (state.caseIndex + 1) / cases.length}>
+    <Shell status={status} onLeave={() => onLeave('')} leaveLabel="تغيير الرقم" stage clock={elapsed} progress={opening ? (state.briefing + 1) / SLIDES.length : quizzing ? (state.quizIndex + 1) / QUIZZES.length : (state.caseIndex + 1) / cases.length}>
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
@@ -70,6 +74,22 @@ export default function StudentRoom({ identity, onLeave }) {
               onStep={(step) => send({ type: 'brief', step })}
               onCurtain={(studentId, guess) => send({ type: 'curtain', studentId, guess })}
             />
+          ) : quizzing ? (
+            <>
+              <QuizCard item={quiz} total={QUIZZES.length} mode="story" />
+              {summary ? (
+                <ResultsBoard item={quiz} summary={summary} myVote={myVote} compact />
+              ) : (
+                <QuizCard
+                  item={quiz}
+                  total={QUIZZES.length}
+                  mode="choices"
+                  myVote={myVote}
+                  votingOpen={votingOpen}
+                  onVote={votingOpen ? (choice) => send({ type: 'vote', choice }) : null}
+                />
+              )}
+            </>
           ) : (
             <>
           <CaseCard item={item} mode="story" />
@@ -93,7 +113,9 @@ export default function StudentRoom({ identity, onLeave }) {
             <span className="me-auto text-xs font-bold text-mist">
               {opening
                 ? SLIDES[state.briefing]?.title
-                : state.phase === 'discuss'
+                : quizzing
+                  ? `سؤال ${quiz.id} / ${QUIZZES.length}`
+                  : state.phase === 'discuss'
                   ? Number(item.addressedTo) === role.id
                     ? 'هالمشكلة إلك'
                     : PHASE_LABEL[state.phase]

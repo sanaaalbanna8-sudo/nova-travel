@@ -70,7 +70,12 @@ export default function StudentRoom({ identity, onLeave }) {
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
-            <Briefing step={state.briefing} curtain={state.curtain} watch onStep={(step) => send({ type: 'brief', step })} />
+            <Briefing
+              step={state.briefing}
+              curtain={state.curtain}
+              watch
+              onStep={(step) => send({ type: 'tap', what: 'شريحة', detail: String(step + 1) })}
+            />
           ) : quizzing ? (
             <>
               <QuizCard item={quiz} total={QUIZZES.length} mode="story" />

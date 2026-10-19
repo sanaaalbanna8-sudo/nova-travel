@@ -228,6 +228,10 @@ wss.on('connection', (ws) => {
     if (message.type === 'vote' && ws.studentId) {
       commit(apply(meeting, { type: 'vote', studentId: ws.studentId, choice: message.choice }, cases.length))
     }
+
+    if (message.type === 'tap' && ws.studentId) {
+      commit(apply(meeting, { type: 'tap', studentId: ws.studentId, what: message.what, detail: message.detail }, cases.length))
+    }
   })
 
   ws.on('close', () => broadcast())

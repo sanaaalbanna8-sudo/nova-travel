@@ -275,7 +275,7 @@ export default function HostRoom({ identity, onLeave }) {
               </div>
             )}
             {showNotes && quizzing && (
-              <p className="text-sm leading-7 text-mist">الجواب الأقرب للدرس ما بينعرض على الشاشة. الأصوات تنحفظ في السجل، وزر انسخي الأصوات يجهّزها للجدول.</p>
+              <p className="text-sm leading-7 text-mist">بعد إغلاق التصويت يظهر الجواب الأصح. الأصوات والنقرات تنحفظ في جدول Google أول بأول.</p>
             )}
             <div className="grid grid-cols-3 gap-2">
               {[5, item.minutes, 10].map((minutes) => (

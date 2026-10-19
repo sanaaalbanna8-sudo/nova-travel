@@ -3,6 +3,7 @@ import cases from '../data/cases.json'
 import roles from '../data/roles.json'
 import { STORAGE_LOCAL } from '../config'
 import { openCloud } from '../lib/cloudRoom'
+import { scheduleSheet } from '../lib/sheetSync'
 import { apply, createState } from '../../shared/meeting.js'
 
 function socketUrl() {
@@ -167,6 +168,12 @@ export function useMeeting(identity) {
   }, [identity.role, identity.pin, identity.studentId])
 
   useEffect(() => {
+    if (identity.role !== 'host' || status !== 'live' || modeRef.current !== 'cloud' || !state) return undefined
+    scheduleSheet(state)
+    return undefined
+  }, [identity.role, status, state])
+
+  useEffect(() => {
     if (identity.role !== 'host' || status !== 'live' || modeRef.current !== 'cloud') return undefined
     if (state?.phase !== 'voting' || !state.voteEndsAt) return undefined
     const wait = Math.max(0, state.voteEndsAt - Date.now() + 120)
@@ -180,6 +187,8 @@ export function useMeeting(identity) {
         wsRef.current.send(JSON.stringify({ type: 'vote', choice: action.choice }))
       } else if (action.type === 'advise' && identityRef.current.role === 'student') {
         wsRef.current.send(JSON.stringify({ type: 'advise', choice: action.choice }))
+      } else if (action.type === 'tap' && identityRef.current.role === 'student') {
+        wsRef.current.send(JSON.stringify({ type: 'tap', what: action.what, detail: action.detail }))
       } else {
         wsRef.current.send(
           JSON.stringify({

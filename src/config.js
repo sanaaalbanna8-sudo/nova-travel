@@ -1,4 +1,6 @@
 export const HOST_NAME = 'سناء البنا'
+export const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwAgj1__EbOE1yrmz_duB0R6vOa92iuBMFS-xztVoZbhikLrtKQqzlYZDABlvtTQFZL8Q/exec'
+export const SHEET_TOKEN = 'NOVA-SHEET-2026'
 export const LOCAL_HOST_PIN = import.meta.env.VITE_HOST_PIN || 'NOVA-BTEC'
 export const STORAGE_IDENTITY = 'nova-identity'
 export const STORAGE_LOCAL = 'nova-meeting-local-v3'

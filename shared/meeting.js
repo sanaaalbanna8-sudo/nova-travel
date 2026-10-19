@@ -150,15 +150,41 @@ export function apply(state, action, caseCount) {
       if (state.advice === action.choice) return state
       return touch({ ...state, advice: action.choice })
     }
+    case 'tap': {
+      if (!studentIdOk(action.studentId)) return state
+      const key = String(Number(action.studentId))
+      return touch({
+        ...state,
+        ledger: [
+          ...(state.ledger || []),
+          {
+            kind: 'tap',
+            studentId: key,
+            what: String(action.what || 'نقرة').slice(0, 40),
+            detail: String(action.detail || '').slice(0, 80),
+            at: Date.now(),
+          },
+        ],
+      })
+    }
     case 'vote': {
       if (state.phase !== PHASE.voting) return state
       if (!studentIdOk(action.studentId)) return state
       if (!CHOICES.includes(action.choice)) return state
       const key = String(Number(action.studentId))
-      if (state.votes[key] === action.choice) return state
       const opened = typeof state.voteEndsAt === 'number' ? state.voteEndsAt - voteSeconds(state) * 1000 : Date.now()
       const ms = Math.max(0, Date.now() - opened)
-      const ledger = [...(state.ledger || [])]
+      const ledger = [
+        ...(state.ledger || []),
+        {
+          kind: 'tap',
+          studentId: key,
+          what: inQuiz(state) ? 'سؤال' : 'حالة',
+          detail: `${inQuiz(state) ? state.quizIndex + 1 : state.caseIndex + 1}:${action.choice}`,
+          at: Date.now(),
+        },
+      ]
+      if (state.votes[key] === action.choice) return touch({ ...state, ledger })
       if (inQuiz(state)) {
         const quizId = state.quizIndex + 1
         const prior = ledger.find((item) => item.kind === 'quiz' && item.studentId === key && item.quizId === quizId)
@@ -201,7 +227,11 @@ export function apply(state, action, caseCount) {
       if ((state.ledger || []).some((item) => item.kind === 'arrive' && item.studentId === key)) return state
       return touch({
         ...state,
-        ledger: [...(state.ledger || []), { kind: 'arrive', studentId: key, at: Date.now() }],
+        ledger: [
+          ...(state.ledger || []),
+          { kind: 'arrive', studentId: key, at: Date.now() },
+          { kind: 'tap', studentId: key, what: 'دخول', detail: '', at: Date.now() },
+        ],
       })
     }
     case 'clear-votes':

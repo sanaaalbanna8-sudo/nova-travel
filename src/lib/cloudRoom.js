@@ -9,7 +9,7 @@ const CONFIG = {
 }
 
 const ROOT = 'novaTravel'
-const STUDENT_ACTIONS = new Set(['vote', 'advise', 'arrive'])
+const STUDENT_ACTIONS = new Set(['vote', 'advise', 'arrive', 'tap'])
 
 function database() {
   const firebase = window.firebase

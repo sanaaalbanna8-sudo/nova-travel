@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import roles from '../data/roles.json'
-import { BRANCHES, managerName, roleById, WORKFLOW } from '../data/org.js'
+import { BRANCHES, MANAGER_OPTIONS, REASONS, managerKey, managerName, roleById, WORKFLOW } from '../data/org.js'
 import { HOST_NAME, LEVEL_STYLE } from '../config'
 
 export const SLIDES = [
   { id: 'org', kicker: 'قبل الحالات', title: 'الهيكل التنظيمي' },
+  { id: 'guess', kicker: 'قبل الحالات', title: 'كشف الستار' },
   { id: 'pyramid', kicker: 'قبل الحالات', title: 'الهرم التنظيمي' },
   { id: 'flow', kicker: 'قبل الحالات', title: 'مسار الشغل' },
   { id: 'infer', kicker: 'قبل الحالات', title: 'أسئلة الاستنتاج' },
@@ -16,18 +18,80 @@ const BANDS = [
   ['operational', 'التشغيلي'],
 ]
 
-function OrgCard({ role, boss }) {
+function OrgCard({ role }) {
   return (
     <article className={`org-card lv-${role.level}`}>
       <strong>{role.nameAr}</strong>
       <b>{role.name}</b>
       <span>{role.title}</span>
-      {boss && <em>مديرتها: {boss}</em>}
     </article>
   )
 }
 
-export default function Briefing({ step = 0, onStep }) {
+function CurtainGame({ seat }) {
+  const [who, setWho] = useState(seat?.id || null)
+  const [guess, setGuess] = useState(null)
+  const [open, setOpen] = useState(false)
+  const player = who ? roleById(who) : null
+  const answer = player ? managerKey(player.id) : null
+  const options = MANAGER_OPTIONS.filter((item) => item.key !== String(who || ''))
+  const right = open && guess === answer
+
+  const chooseGirl = (id) => {
+    setWho(id)
+    setGuess(null)
+    setOpen(false)
+  }
+
+  return (
+    <div className="guess-game">
+      {!seat && (
+        <div className="guess-cast">
+          {roles.map((role) => (
+            <button key={role.id} type="button" className={who === role.id ? 'is-on' : ''} onClick={() => chooseGirl(role.id)}>
+              {role.nameAr}
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="guess-ask">{player ? `يا ${player.nameAr}، مين مديرتك المباشرة؟` : 'اختاري بنت، وخليها تحزر مين مديرتها.'}</p>
+      <div className="guess-options">
+        {options.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            className={guess === item.key ? 'is-on' : ''}
+            disabled={!player || open}
+            onClick={() => setGuess(item.key)}
+          >
+            <strong>{item.nameAr}</strong>
+            <b>{item.name}</b>
+          </button>
+        ))}
+      </div>
+      <div className={`curtain ${open ? 'is-open' : ''}`}>
+        <div className="curtain-reveal">
+          {open && player && (
+            <>
+              <p className={right ? 'is-right' : 'is-wrong'}>{right ? 'صح' : 'مو هيك'}</p>
+              <strong>مديرتها {managerName(player.id)}</strong>
+              <span>{REASONS[player.id]}</span>
+            </>
+          )}
+        </div>
+        <i className="curtain-half is-start" />
+        <i className="curtain-half is-end" />
+        {!open && (
+          <button className="btn-gold curtain-open" type="button" disabled={!player || !guess} onClick={() => setOpen(true)}>
+            اكشفي الستار
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default function Briefing({ step = 0, onStep, seat = null }) {
   const slide = SLIDES[step] || SLIDES[0]
   const ghazal = roleById(4)
 
@@ -56,20 +120,19 @@ export default function Briefing({ step = 0, onStep }) {
               </article>
             </div>
             <div className="org-tier">
-              <OrgCard role={ghazal} boss={HOST_NAME} />
+              <OrgCard role={ghazal} />
             </div>
             <div className="org-branches">
               {BRANCHES.map((branch) => {
                 const lead = roleById(branch.lead)
                 return (
                   <div key={branch.lead} className={`org-branch ${branch.team.length > 2 ? 'is-wide' : ''}`}>
-                    <OrgCard role={lead} boss={managerName(lead.id)} />
+                    <OrgCard role={lead} />
                     {branch.team.length > 0 && (
                       <div className="org-kids">
-                        {branch.team.map((id) => {
-                          const role = roleById(id)
-                          return <OrgCard key={id} role={role} boss={managerName(id)} />
-                        })}
+                        {branch.team.map((id) => (
+                          <OrgCard key={id} role={roleById(id)} />
+                        ))}
                       </div>
                     )}
                   </div>
@@ -77,11 +140,13 @@ export default function Briefing({ step = 0, onStep }) {
               })}
             </div>
           </div>
-          <p>غزل هي المدير التنفيذي، وفوق إيمان وروز. تحت كل اسم مكتوب: مديرتها.</p>
+          <p>المستطيلات والخطوط بس. اسم المديرة لسه مخبّى.</p>
         </div>
       )}
 
-      {step === 1 && (
+      {step === 1 && <CurtainGame seat={seat} />}
+
+      {step === 2 && (
         <div className="pyramid">
           <div className="pyr-row is-apex">
             <article className="pyr-card is-host">
@@ -117,7 +182,7 @@ export default function Briefing({ step = 0, onStep }) {
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="brief-org">
           <p>من أول معلومة لين القرار. كل بنت إلها فعل واحد، على نفس نهج مسار البيانات.</p>
           <ol className="life-flow">
@@ -135,11 +200,11 @@ export default function Briefing({ step = 0, onStep }) {
         </div>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <ol className="infer-list">
           <li>
             <b>مين مديرك المباشر؟</b>
-            <span>انظري لصندوقك في الهيكل التنظيمي. تحت اسمك مكتوب: مديرتها.</span>
+            <span>من شريحة كشف الستار. إذا الستار لسه مسكّر، احزري من مكانك في الهيكل.</span>
           </li>
           <li>
             <b>لو الشركة حقيقية، شو أول مهمة لك هذا الأسبوع؟</b>
@@ -156,7 +221,7 @@ export default function Briefing({ step = 0, onStep }) {
         </ol>
       )}
 
-      {step === 4 && (
+      {step === 5 && (
         <div className="brief-org">
           <p>من معرفتكم السابقة، قبل الحالات. الهدف ج: السياسة، والقانون، والأخلاق، وأمن المعلومة، والتهديد وكيف نخففه.</p>
           <ol className="infer-list">

@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import cases from '../data/cases.json'
 import roles from '../data/roles.json'
 import { BRAND_EN, LEVEL_STYLE, MEETING_AR, MEETING_EN, PHASE_LABEL } from '../config'
-import { managerName } from '../data/org.js'
 import { SLIDES } from './Briefing'
 import { summarize } from '../../shared/meeting.js'
 import { useMeeting } from '../hooks/useMeeting'
@@ -65,7 +64,7 @@ export default function StudentRoom({ identity, onLeave }) {
       <div className={`board board-student ${opening ? 'is-opening' : ''}`}>
         <div className="board-main">
           {opening ? (
-            <Briefing step={state.briefing} onStep={(step) => send({ type: 'brief', step })} />
+            <Briefing step={state.briefing} seat={role} onStep={(step) => send({ type: 'brief', step })} />
           ) : (
             <>
           <CaseCard item={item} mode="story" />
@@ -86,7 +85,6 @@ export default function StudentRoom({ identity, onLeave }) {
             <span className={`chip ${LEVEL_STYLE[role.level].chip}`}>{role.levelLabel}</span>
             <strong className="text-sm text-ink">{role.name}</strong>
             <span className="text-xs font-bold text-faint">{role.title}</span>
-            <span className="text-xs font-extrabold text-sea">مديرتك: {managerName(role.id)}</span>
             <span className="me-auto text-xs font-bold text-mist">
               {opening
                 ? SLIDES[state.briefing]?.title

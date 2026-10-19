@@ -653,23 +653,23 @@ input:focus-visible {
 
 .slide-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
   margin: 0 0 12px;
 }
 
 .slide-tabs button {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 8px 8px;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px;
   border: 0;
   border-radius: 16px;
   background: #fff;
   color: #1c2433;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   font-weight: 800;
   text-align: right;
   box-shadow: inset 0 0 0 1px #e4ebf3;
@@ -1236,5 +1236,135 @@ button.choice-card:hover {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
+
+.guess-game {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.guess-cast,
+.guess-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.guess-cast button,
+.guess-options button {
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #e4ebf3;
+  color: #1c2433;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.guess-cast button {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.guess-options button {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  padding: 8px 10px;
+  text-align: right;
+}
+
+.guess-options button b {
+  color: #8a6420;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.guess-cast button.is-on,
+.guess-options button.is-on {
+  background: #fff8ea;
+  box-shadow: inset 0 0 0 2px #c9a227;
+}
+
+.guess-options button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.guess-ask {
+  margin: 0;
+  color: #1c2433;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.curtain {
+  position: relative;
+  min-height: 168px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #fff8ea;
+}
+
+.curtain-reveal {
+  display: flex;
+  min-height: 168px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px;
+  text-align: center;
+}
+
+.curtain-reveal p {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.curtain-reveal .is-right { color: #0e7c84; }
+.curtain-reveal .is-wrong { color: #e15a4a; }
+
+.curtain-reveal strong {
+  color: #1c2433;
+  font-size: 1.35rem;
+}
+
+.curtain-reveal span {
+  max-width: 46rem;
+  color: #3d4654;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.curtain-half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 50%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 10px, transparent 10px 22px),
+    linear-gradient(#7a2433, #4d1520);
+  transition: transform 0.75s ease;
+}
+
+.curtain-half.is-start { right: 0; }
+.curtain-half.is-end { left: 0; }
+.curtain.is-open .curtain-half.is-start { transform: translateX(105%); }
+.curtain.is-open .curtain-half.is-end { transform: translateX(-105%); }
+
+.curtain-open {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 
 

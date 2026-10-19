@@ -6,7 +6,7 @@ export const PHASE = {
 
 export const CHOICES = ['A', 'B', 'C']
 export const VOTE_SECONDS = 12
-export const BRIEF_MAX = 4
+export const BRIEF_MAX = 5
 
 export function createState() {
   return {

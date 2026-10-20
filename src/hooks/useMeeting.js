@@ -6,6 +6,10 @@ import { openCloud } from '../lib/cloudRoom'
 import { scheduleSheet } from '../lib/sheetSync'
 import { apply, createState } from '../../shared/meeting.js'
 
+function onGitHubPages() {
+  return window.location.hostname.endsWith('github.io')
+}
+
 function socketUrl() {
   if (import.meta.env.VITE_SYNC_URL) return import.meta.env.VITE_SYNC_URL
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -71,6 +75,12 @@ export function useMeeting(identity) {
           return
         }
         if (!session) {
+          clouding = false
+          if (onGitHubPages()) {
+            setStatus('connecting')
+            retry = setTimeout(enterCloud, 1500)
+            return
+          }
           enterLocal()
           return
         }
@@ -155,7 +165,8 @@ export function useMeeting(identity) {
       ws.onerror = () => {}
     }
 
-    connect()
+    if (onGitHubPages()) enterCloud()
+    else connect()
 
     return () => {
       stopped = true

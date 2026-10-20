@@ -24,34 +24,73 @@ function screenOf(state) {
   return 'cases'
 }
 
+function defang(value) {
+  if (Array.isArray(value)) return value.map(defang)
+  if (!value || typeof value !== 'object') return value
+  const out = {}
+  for (const [key, item] of Object.entries(value)) {
+    out[/^\d+$/.test(key) ? `k${key}` : key] = defang(item)
+  }
+  return out
+}
+
+function rehydrate(value) {
+  if (Array.isArray(value)) {
+    const objects = value.filter((item) => item && typeof item === 'object')
+    const ledger = objects.some((item) => item.kind)
+    if (!ledger && (objects.length > 0 || value.some((item) => typeof item === 'string'))) {
+      const out = {}
+      value.forEach((item, index) => {
+        if (item != null) out[String(index)] = rehydrate(item)
+      })
+      return out
+    }
+    return value.map(rehydrate)
+  }
+  if (!value || typeof value !== 'object') return value
+  const out = {}
+  for (const [key, item] of Object.entries(value)) {
+    const plain = /^k(\d+)$/.exec(key)
+    out[plain ? plain[1] : key] = rehydrate(item)
+  }
+  return out
+}
+
+function asMap(value) {
+  const data = rehydrate(value)
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {}
+  return data
+}
+
 function pack(state) {
-  return JSON.parse(JSON.stringify({ ...state, screen: screenOf(state) }))
+  return defang(JSON.parse(JSON.stringify({ ...state, screen: screenOf(state) })))
 }
 
 function normalize(raw) {
-  if (!raw || typeof raw.rev !== 'number') return null
-  let briefing = typeof raw.briefing === 'number' ? raw.briefing : 0
-  let quizIndex = Number.isInteger(raw.quizIndex) ? raw.quizIndex : null
-  if (raw.screen === 'quiz') briefing = null
-  if (raw.screen === 'cases') {
+  const data = rehydrate(raw)
+  if (!data || typeof data.rev !== 'number') return null
+  let briefing = typeof data.briefing === 'number' ? data.briefing : 0
+  let quizIndex = Number.isInteger(data.quizIndex) ? data.quizIndex : null
+  if (data.screen === 'quiz') briefing = null
+  if (data.screen === 'cases') {
     briefing = null
     quizIndex = null
   }
   return {
     ...createState(),
-    ...raw,
-    votes: raw.votes && typeof raw.votes === 'object' ? raw.votes : {},
-    history: raw.history && typeof raw.history === 'object' ? raw.history : {},
-    quizHistory: raw.quizHistory && typeof raw.quizHistory === 'object' ? raw.quizHistory : {},
-    ledger: Array.isArray(raw.ledger) ? raw.ledger : [],
-    advice: raw.advice || null,
-    timerEndsAt: typeof raw.timerEndsAt === 'number' ? raw.timerEndsAt : null,
-    voteEndsAt: typeof raw.voteEndsAt === 'number' ? raw.voteEndsAt : null,
+    ...data,
+    votes: asMap(data.votes),
+    history: asMap(data.history),
+    quizHistory: asMap(data.quizHistory),
+    ledger: Array.isArray(data.ledger) ? data.ledger : [],
+    advice: data.advice || null,
+    timerEndsAt: typeof data.timerEndsAt === 'number' ? data.timerEndsAt : null,
+    voteEndsAt: typeof data.voteEndsAt === 'number' ? data.voteEndsAt : null,
     quizIndex,
     briefing,
     curtain: {
-      studentId: Number.isInteger(Number(raw.curtain?.studentId)) ? Number(raw.curtain.studentId) : 0,
-      guess: raw.curtain?.guess ? String(raw.curtain.guess) : '',
+      studentId: Number.isInteger(Number(data.curtain?.studentId)) ? Number(data.curtain.studentId) : 0,
+      guess: data.curtain?.guess ? String(data.curtain.guess) : '',
     },
   }
 }
@@ -163,7 +202,7 @@ export function openCloud(identity, caseCount) {
     const onPresence = (snap) => {
       const val = snap.val() || {}
       const ids = Object.keys(val)
-        .map((key) => Number(key))
+        .map((key) => Number(String(key).replace(/^s/, '')))
         .filter((id) => Number.isInteger(id) && id >= 1 && id <= 17)
         .sort((a, b) => a - b)
       sawPresence = true
@@ -174,7 +213,7 @@ export function openCloud(identity, caseCount) {
     listeners.push(() => presenceRoot.off('value', onPresence))
 
     if (identity.role === 'student' && Number.isInteger(Number(identity.studentId))) {
-      const id = String(Number(identity.studentId))
+      const id = `s${Number(identity.studentId)}`
       const presenceRef = db.ref(`${ROOT}/presence/${id}`)
       const seatRef = db.ref(`${ROOT}/seats/${id}`)
       presenceRef.onDisconnect().remove()
@@ -199,6 +238,6 @@ export function openCloud(identity, caseCount) {
       if (settled) return
       session.close()
       finish(null)
-    }, 8000)
+    }, 20000)
   })
 }

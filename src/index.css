@@ -669,7 +669,7 @@ input:focus-visible {
   background: rgba(255, 255, 255, 0.9);
 }
 
-.board.is-opening {
+.board.is-present {
   grid-template-columns: minmax(0, 1fr);
 }
 

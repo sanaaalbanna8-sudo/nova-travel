@@ -97,9 +97,9 @@ export default function HostRoom({ identity, onLeave }) {
 
   return (
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={opening ? (state.briefing + 1) / SLIDES.length : quizzing ? (state.quizIndex + 1) / QUIZZES.length : (state.caseIndex + 1) / cases.length}>
-      <div className={`board ${opening ? 'is-opening' : ''}`}>
-        {!present && !opening && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={quizzing ? null : item.addressedTo} />}
-        <div className="board-main" style={present || opening ? { gridColumn: '1 / -1' } : undefined}>
+      <div className={`board ${opening ? 'is-opening' : ''} ${present ? 'is-present' : ''}`}>
+        {!present && <Roster roles={roles} onlineIds={onlineIds} votes={state.votes} spotlight={opening || quizzing ? null : item.addressedTo} />}
+        <div className="board-main" style={present ? { gridColumn: '1 / -1' } : undefined}>
           {opening ? (
             <Briefing
               step={state.briefing}

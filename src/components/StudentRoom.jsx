@@ -117,10 +117,6 @@ export default function StudentRoom({ identity, onLeave }) {
                 ? SLIDES[state.briefing]?.title
                 : quizzing
                   ? `سؤال ${quiz.id} / ${QUIZZES.length}`
-                  : state.phase === 'discuss'
-                  ? Number(item.addressedTo) === role.id
-                    ? 'هالمشكلة إلك'
-                    : PHASE_LABEL[state.phase]
                   : PHASE_LABEL[state.phase]}
               {clock ? ` · ${clock.done ? 'انتهى النقاش' : clock.label}` : ''}
             </span>
